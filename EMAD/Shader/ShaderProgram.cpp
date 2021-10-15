@@ -68,7 +68,12 @@ Program::~Program()
 	glDeleteProgram(mProgram);
 }
 
-void Program::activate()
+void Program::activate() const noexcept
 {
 	glUseProgram(mProgram);
+}
+
+void Program::setInt(const std::string& name, int value) const noexcept
+{
+	glUniform1i(glGetUniformLocation(mProgram, name.c_str()), value);
 }

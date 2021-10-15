@@ -9,7 +9,9 @@ public:
 	Program(const std::string& vShader, const std::string& fShader);
 	~Program();
 
-	void activate();
+	void activate() const noexcept;
+
+	void setInt(const std::string& name, int value) const noexcept;
 private:
 	unsigned int mProgram;
 };

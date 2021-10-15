@@ -1,5 +1,8 @@
 #include "Renderer.h"
 #include "Shader/ShaderProgram.h"
+#include "Exception.h"
+
+#include "stb_image.h"
 
 #include <iostream>
 
@@ -11,19 +14,17 @@ App::~App()
 }
 
 int App::run()
-{
-    //test
-    
+{ 
     //创建着色器程序
     Program testProgram("Shader/test_vs.vert", "Shader/test_fs.frag");
-     
 
-    //顶点位置数据
+    //顶点属性数据
     float vertices[] = {
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left 
+        // 位置              // 颜色            // 纹理坐标
+         0.5f,  0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  1.0f, 1.0f,// top right
+         0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 0.0f,// bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,// bottom left
+        -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 0.0f,  0.0f, 1.0f// top left 
     };
     //顶点索引
     unsigned int indices[] = {
@@ -47,8 +48,12 @@ int App::run()
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
     // configure vertex attributes(s)
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -63,6 +68,52 @@ int App::run()
     // uncomment this call to draw in wireframe polygons.
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
+    // load and create texture(s)
+    unsigned int texture1, texture2;
+    glGenTextures(1, &texture1);
+    glGenTextures(1, &texture2);
+
+    // bind texture 1
+    glBindTexture(GL_TEXTURE_2D, texture1);
+    // 为当前绑定的纹理对象设置环绕、过滤方式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 加载图片并生成纹理
+    int width, height, nrChannels;         
+    stbi_set_flip_vertically_on_load(true);
+    unsigned char* data = stbi_load("Resource/container.jpg", &width, &height, &nrChannels, 0);
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        THROW_INFO_EXCEPTION("Failed to create texture2D");
+    }
+    stbi_image_free(data);
+    // bind texture 2
+    glBindTexture(GL_TEXTURE_2D, texture2);
+    // 为当前绑定的纹理对象设置环绕、过滤方式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 加载图片并生成纹理
+    data = stbi_load("Resource/awesomeface.png", &width, &height, &nrChannels, 0);
+    if (data) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else {
+        THROW_INFO_EXCEPTION("Failed to create texture2D");
+    }
+    stbi_image_free(data);
+    // 设置采样器对应的纹理单元
+    testProgram.activate();
+    testProgram.setInt("ourTexture1", 0);
+    testProgram.setInt("ourTexture2", 1);
+
     while (!glfwWindowShouldClose(mWindow.window()))
     {
         // input
@@ -74,6 +125,11 @@ int App::run()
         glClear(GL_COLOR_BUFFER_BIT);
 
         testProgram.activate();
+        //激活纹理单元(texture uint)
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture1);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, texture2);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
