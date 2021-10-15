@@ -30,6 +30,9 @@
     <ClCompile Include="EMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Shader\ShaderProgram.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GWin\GWin.h">
@@ -41,5 +44,12 @@
     <ClInclude Include="Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Shader\ShaderProgram.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shader\test_vs.vert" />
+    <None Include="Shader\test_fs.frag" />
   </ItemGroup>
 </Project>
