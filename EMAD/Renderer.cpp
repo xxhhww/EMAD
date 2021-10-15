@@ -12,6 +12,8 @@ App::~App()
 
 int App::run()
 {
+    //test
+    
     //创建着色器程序
     Program testProgram("Shader/test_vs.vert", "Shader/test_fs.frag");
      
