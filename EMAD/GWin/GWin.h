@@ -12,6 +12,9 @@ public:
 	~GWin();
 
 	GLFWwindow* window() noexcept { return mWindow; }
+
+	std::pair<int, int> getRectangle() const noexcept;
+	void setRectangle(int width, int height) noexcept;
 private:
 	int mWidth;
 	int mHeight;

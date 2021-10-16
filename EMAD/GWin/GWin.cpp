@@ -19,12 +19,17 @@ GWin::GWin(int width, int height, const std::string& name)
         THROW_INFO_EXCEPTION("Failed to create GLFW window");
     }
 
-    //单窗口程序，直接设置为当前线程上下文
+    // 单窗口程序，直接设置为当前线程上下文
     glfwMakeContextCurrent(mWindow);
-    //设置窗口大小改变时的回调函数
+    // 设置用户数据指针
+    glfwSetWindowUserPointer(mWindow, this);
+    // 设置窗口大小改变时的回调函数
     glfwSetFramebufferSizeCallback(mWindow,
         [](GLFWwindow* window, int width, int height) {
+            // 改变OpenGL视口变换矩阵
             glViewport(0, 0, width, height);
+            GWin* userData = (GWin*)glfwGetWindowUserPointer(window);
+            userData->setRectangle(width, height);
         }
     );
 
@@ -37,4 +42,15 @@ GWin::GWin(int width, int height, const std::string& name)
 GWin::~GWin()
 {
     glfwTerminate();
+}
+
+std::pair<int, int> GWin::getRectangle() const noexcept
+{
+    return std::pair<int, int>(mWidth, mHeight);
+}
+
+void GWin::setRectangle(int width, int height) noexcept
+{
+    mWidth = width;
+    mHeight = height;
 }
