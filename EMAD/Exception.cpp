@@ -8,10 +8,12 @@ BaseException::BaseException(int line, const std::string& file) noexcept
 const char* BaseException::what() const noexcept
 {
 	std::ostringstream oss;
-	//从子类获取错误信息
-	oss << mOtherErrorStr;
-	//获取基础错误信息(行、文件)
+
+	// 获取基础错误信息(行、文件)
 	oss << getBaseErrorStr();
+	// 从子类获取错误信息
+	oss << "[Desc] ";
+	oss << mOtherErrorStr;
 
 	mWhatBuffer = oss.str();
 
