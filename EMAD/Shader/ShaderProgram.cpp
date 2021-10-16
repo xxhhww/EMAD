@@ -77,3 +77,8 @@ void Program::setInt(const std::string& name, int value) const noexcept
 {
 	glUniform1i(glGetUniformLocation(mProgram, name.c_str()), value);
 }
+
+void Program::setMatrix(const std::string& name, float* value) const noexcept
+{
+	glUniformMatrix4fv(glGetUniformLocation(mProgram, name.c_str()), 1, GL_FALSE, value);
+}

@@ -19,13 +19,6 @@ App::~App()
 
 int App::run()
 {
-    //test glm
-    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-    vec = trans * vec;
-    std::cout << vec.x << vec.y << vec.z << std::endl;
-
     //创建着色器程序
     Program testProgram("Shader/test_vs.vert", "Shader/test_fs.frag");
 
@@ -136,11 +129,17 @@ int App::run()
         glClear(GL_COLOR_BUFFER_BIT);
 
         testProgram.activate();
-        //激活纹理单元(texture uint)
+        // 激活并绑定纹理单元(texture uint)
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
+        // 绑定顶点着色器的常量缓存
+        //test glm
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        trans = glm::scale(trans, glm::vec3(0.5f, 0.5f, 0.5f));
+        testProgram.setMatrix("transform", glm::value_ptr(trans));
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 

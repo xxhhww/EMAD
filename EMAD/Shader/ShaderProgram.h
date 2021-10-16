@@ -12,6 +12,7 @@ public:
 	void activate() const noexcept;
 
 	void setInt(const std::string& name, int value) const noexcept;
+	void setMatrix(const std::string& name, float* value) const noexcept;
 private:
 	unsigned int mProgram;
 };
