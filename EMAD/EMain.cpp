@@ -5,7 +5,7 @@
 
 int main() {
 	try {
-		return App{ 800, 600 }.run();
+		return App{ 1280, 720 }.run();
 	}
     catch (const BaseException& e) {
         std::cout << e.what() << std::endl;

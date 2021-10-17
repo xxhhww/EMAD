@@ -1,4 +1,8 @@
 #include "Camera.h"
+#include <iostream>
+
+#include <DirectXMath.h>
+#include <algorithm>
 
 Camera::Camera()
 {
@@ -13,23 +17,28 @@ Camera::Camera()
 void Camera::translate(glm::vec3 translation) noexcept
 {
 	glm::mat4 rotation = glm::mat4(1.0f);
+	rotation = glm::rotate(rotation, glm::radians(mYaw), glm::vec3{ 0.0f, 1.0f, 0.0f });
 	rotation = glm::rotate(rotation, glm::radians(mPitch), glm::vec3{ 1.0f, 0.0f, 0.0f });
-	rotation = glm::rotate(rotation, glm::radians(0.0f), glm::vec3{ 0.0f, 1.0f, 0.0f });
 
 	glm::vec3 trans = rotation * glm::vec4{ translation, 0.0f };
 
-	mPosition += trans;
+	mPosition += (trans * mTranslationSpeed);
 }
 
 void Camera::rotate(float dx, float dy) noexcept
 {
-	mYaw += dx * mRotationSpeed;
-	mPitch += dy * mRotationSpeed;
+	mPitch = std::clamp(mPitch + dy * mRotationSpeed, -89.0f, 89.0f);
 
-	if (mPitch > 89.0f)
-		mPitch = 89.0f;
-	if (mPitch < -89.0f)
-		mPitch = -89.0f;
+	mYaw = mYaw + dx * mRotationSpeed;
+
+	std::cout << mPitch << std::endl;
+	std::cout << mYaw << std::endl;
+	const float rt = fmod(mYaw, 360.0f);
+	
+	if (rt > 180.0f)
+		mYaw = rt - 360.0f;
+	else if (rt < -180.0f)
+		mYaw = rt + 360.0f;
 }
 
 void Camera::setAspect(float value) noexcept
@@ -40,8 +49,8 @@ void Camera::setAspect(float value) noexcept
 glm::mat4 Camera::getView() const noexcept
 {
 	glm::mat4 rotation = glm::mat4(1.0f);
+	rotation = glm::rotate(rotation, glm::radians(mYaw), glm::vec3{ 0.0f, 1.0f, 0.0f });
 	rotation = glm::rotate(rotation, glm::radians(mPitch), glm::vec3{ 1.0f, 0.0f, 0.0f });
-	rotation = glm::rotate(rotation, glm::radians(0.0f), glm::vec3{ 0.0f, 1.0f, 0.0f });
 
 	glm::vec3 lookAtVector = rotation * mFixedFront;
 	return glm::lookAt(mPosition, mPosition + lookAtVector, mFixedWorldUp);

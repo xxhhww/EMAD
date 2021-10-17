@@ -25,8 +25,8 @@ private:
 	float mPitch; //¸©Ñö½Ç
 	float mYaw; //Æ«º½½Ç
 
-	const float mTranslationSpeed = 12.0f;
-	const float mRotationSpeed = 0.05f;
+	const float mTranslationSpeed = 10.0f;
+	const float mRotationSpeed = 0.04f;
 	const glm::vec4 mFixedFront = { 0.0f, 0.0f, -1.0f, 0.0f };
 	const glm::vec3 mFixedWorldUp = { 0.0f, 1.0f, 0.0f };
 };

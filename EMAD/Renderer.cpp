@@ -57,6 +57,7 @@ int App::run()
         if (glfwGetKey(mWindow.window(), GLFW_KEY_D) == GLFW_PRESS)
             testCamera.translate({ deltaTime, 0.0f, 0.0f });
         const auto cursorOffset = mWindow.getCursorOffset();
+        mWindow.setCursorOffset(0.0f, 0.0f);
         testCamera.rotate(cursorOffset.first, cursorOffset.second);
 
         // clear buffer
