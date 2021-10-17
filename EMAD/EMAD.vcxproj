@@ -155,6 +155,7 @@
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="GWin\GWin.cpp" />
+    <ClCompile Include="Object\Camera\Camera.cpp" />
     <ClCompile Include="Object\EObject.cpp" />
     <ClCompile Include="Object\Geometry\TestCube.cpp" />
     <ClCompile Include="Renderer.cpp" />
@@ -164,6 +165,7 @@
   <ItemGroup>
     <ClInclude Include="Exception.h" />
     <ClInclude Include="GWin\GWin.h" />
+    <ClInclude Include="Object\Camera\Camera.h" />
     <ClInclude Include="Object\EObject.h" />
     <ClInclude Include="Object\Geometry\TestCube.h" />
     <ClInclude Include="Renderer.h" />

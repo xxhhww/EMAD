@@ -8,6 +8,9 @@ GWin::GWin(int width, int height, const std::string& name)
     ,mHeight(height)
     ,mName(name)
 {
+    mLastX = (double)width / 2;
+    mLastY = (double)height / 2;
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -32,6 +35,18 @@ GWin::GWin(int width, int height, const std::string& name)
             userData->setRectangle(width, height);
         }
     );
+    // 设置鼠标移动时的回调函数
+    glfwSetCursorPosCallback(mWindow,
+        [](GLFWwindow* window, double xpos, double ypos) {
+            GWin* userData = (GWin*)glfwGetWindowUserPointer(window);
+            const auto lastPos = userData->getCursorPos();
+            double offsetX = lastPos.first - xpos;
+            double offsetY = lastPos.second - ypos;
+
+            userData->setCursorPos(xpos, ypos);
+            userData->setCursorOffset(offsetX, offsetY);
+        }
+    );
 
     // glad: load all OpenGL function pointers
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
@@ -53,4 +68,26 @@ void GWin::setRectangle(int width, int height) noexcept
 {
     mWidth = width;
     mHeight = height;
+}
+
+std::pair<double, double> GWin::getCursorPos() const noexcept
+{
+    return std::pair<double, double>(mLastX, mLastY);
+}
+
+void GWin::setCursorPos(double posX, double posY) noexcept
+{
+    mLastX = posX;
+    mLastY = posY;
+}
+
+std::pair<double, double> GWin::getCursorOffset() const noexcept
+{
+    return std::pair<double, double>(mOffsetX, mOffsetY);
+}
+
+void GWin::setCursorOffset(double offsetX, double offsetY) noexcept
+{
+    mOffsetX = offsetX;
+    mOffsetY = offsetY;
 }
