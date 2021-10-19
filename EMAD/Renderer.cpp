@@ -2,6 +2,10 @@
 #include "Object/Geometry/TestCube.h"
 #include "Object/Camera/Camera.h"
 
+#include "ImGui/imgui.h"
+#include "ImGui/imgui_impl_glfw.h"
+#include "ImGui/imgui_impl_opengl3.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -20,6 +24,7 @@ App::~App()
 
 int App::run()
 {
+
     glfwSetInputMode(mWindow.window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     Camera testCamera;
@@ -76,6 +81,17 @@ int App::run()
             testCamera.setAspect(aspect);
             testCube.draw(model, testCamera.getView(), testCamera.getProjection());
         }
+
+        //´´½¨imgui
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        bool isShow = true;
+        ImGui::ShowDemoWindow(&isShow);
+        ImGui::Render();
+
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(mWindow.window());
         glfwPollEvents();

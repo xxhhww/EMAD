@@ -1,6 +1,10 @@
 #include "GWin.h"
 #include "../Exception.h"
 
+#include "../ImGui/imgui.h"
+#include "../ImGui/imgui_impl_glfw.h"
+#include "../ImGui/imgui_impl_opengl3.h"
+
 #include <iostream>
 
 GWin::GWin(int width, int height, const std::string& name)
@@ -52,6 +56,13 @@ GWin::GWin(int width, int height, const std::string& name)
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)){
         THROW_INFO_EXCEPTION("Failed to initialize GLAD");
     }
+
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOpenGL(mWindow, true);
+    ImGui_ImplOpenGL3_Init("#version 130");
 }
 
 GWin::~GWin()
