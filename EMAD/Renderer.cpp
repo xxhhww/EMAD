@@ -16,6 +16,7 @@ App::App(int width, int height, const std::string& name) noexcept
 	:mWindow(width, height, name){
     // 启东深度缓冲测试
     glEnable(GL_DEPTH_TEST);
+    mCamera = std::make_shared<Camera>();
 }
 
 App::~App()
@@ -24,10 +25,6 @@ App::~App()
 
 int App::run()
 {
-
-    glfwSetInputMode(mWindow.window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-    Camera testCamera;
     TestCube testCube;
     glm::vec3 cubePositions[] = {
         glm::vec3(0.0f,  0.0f,  0.0f),
@@ -50,20 +47,7 @@ int App::run()
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
 
-        // handle input
-        if (glfwGetKey(mWindow.window(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(mWindow.window(), true);
-        if (glfwGetKey(mWindow.window(), GLFW_KEY_W) == GLFW_PRESS)
-            testCamera.translate({ 0.0f, 0.0f, -deltaTime });
-        if (glfwGetKey(mWindow.window(), GLFW_KEY_S) == GLFW_PRESS)
-            testCamera.translate({0.0f, 0.0f, deltaTime});
-        if (glfwGetKey(mWindow.window(), GLFW_KEY_A) == GLFW_PRESS)
-            testCamera.translate({ -deltaTime, 0.0f, 0.0f });
-        if (glfwGetKey(mWindow.window(), GLFW_KEY_D) == GLFW_PRESS)
-            testCamera.translate({ deltaTime, 0.0f, 0.0f });
-        const auto cursorOffset = mWindow.getCursorOffset();
-        mWindow.setCursorOffset(0.0f, 0.0f);
-        testCamera.rotate(cursorOffset.first, cursorOffset.second);
+        handleInput(deltaTime);
 
         // clear buffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -78,23 +62,50 @@ int App::run()
             model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
             // projection trans
             float aspect = (float)mWindow.getRectangle().first / (float)mWindow.getRectangle().second;  
-            testCamera.setAspect(aspect);
-            testCube.draw(model, testCamera.getView(), testCamera.getProjection());
+            mCamera->setAspect(aspect);
+            testCube.draw(model, mCamera->getView(), mCamera->getProjection());
         }
+
 
         //创建imgui
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        bool isShow = true;
-        ImGui::ShowDemoWindow(&isShow);
-        ImGui::Render();
+        //bool isShow = true;
+        //ImGui::ShowDemoWindow(&isShow);
 
+        mCamera->genCtrlGui();
+
+        ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
 
         glfwSwapBuffers(mWindow.window());
         glfwPollEvents();
     }
     return 0;
+}
+
+void App::handleInput(float dt) noexcept
+{
+    // esc为窗口退出键
+    if (glfwGetKey(mWindow.window(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+        glfwSetWindowShouldClose(mWindow.window(), true);
+
+    if (!mWindow.isCursorEnabled()) {
+        // handle input
+        if (glfwGetKey(mWindow.window(), GLFW_KEY_W) == GLFW_PRESS)
+            mCamera->translate({ 0.0f, 0.0f, dt });
+        if (glfwGetKey(mWindow.window(), GLFW_KEY_S) == GLFW_PRESS)
+            mCamera->translate({ 0.0f, 0.0f, -dt });
+        if (glfwGetKey(mWindow.window(), GLFW_KEY_A) == GLFW_PRESS)
+            mCamera->translate({ -dt, 0.0f, 0.0f });
+        if (glfwGetKey(mWindow.window(), GLFW_KEY_D) == GLFW_PRESS)
+            mCamera->translate({ dt, 0.0f, 0.0f });
+
+        const auto cursorOffset = mWindow.getCursorOffset();
+        mWindow.setCursorOffset(0.0f, 0.0f);
+        mCamera->rotate(cursorOffset.first, cursorOffset.second);
+    }
 }

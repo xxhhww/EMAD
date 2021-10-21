@@ -1,4 +1,6 @@
 #include "Camera.h"
+#include "../../ImGui/imgui.h"
+
 #include <iostream>
 
 #include <DirectXMath.h>
@@ -12,33 +14,37 @@ Camera::Camera()
 	mNear = 0.1f;
 	mFar = 100.0f;
 	reset();
+	updateVector();
 }
 
 void Camera::translate(glm::vec3 translation) noexcept
 {
-	glm::mat4 rotation = glm::mat4(1.0f);
-	rotation = glm::rotate(rotation, glm::radians(mYaw), glm::vec3{ 0.0f, 1.0f, 0.0f });
-	rotation = glm::rotate(rotation, glm::radians(mPitch), glm::vec3{ 1.0f, 0.0f, 0.0f });
-
-	glm::vec3 trans = rotation * glm::vec4{ translation, 0.0f };
-
-	mPosition += (trans * mTranslationSpeed);
+	// 前后移动
+	if (translation.x == 0) {
+		mPosition += (mFront * translation.z * mTranslationSpeed);
+	}
+	// 左右移动
+	else if (translation.z == 0) {
+		mPosition += (mRight * translation.x * mTranslationSpeed);
+	}
 }
 
 void Camera::rotate(float dx, float dy) noexcept
 {
-	mPitch = std::clamp(mPitch + dy * mRotationSpeed, -89.0f, 89.0f);
+	mYaw += dx * mRotationSpeed;
+	mPitch += dy * mRotationSpeed;
 
-	mYaw = mYaw + dx * mRotationSpeed;
+	if (mPitch > 89.0f)
+		mPitch = 89.0f;
+	if (mPitch < -89.0f)
+		mPitch = -89.0f;
 
-	std::cout << mPitch << std::endl;
-	std::cout << mYaw << std::endl;
-	const float rt = fmod(mYaw, 360.0f);
-	
-	if (rt > 180.0f)
-		mYaw = rt - 360.0f;
-	else if (rt < -180.0f)
-		mYaw = rt + 360.0f;
+	if (mYaw > 90.0f)
+		mYaw -= 360.0f;
+	if (mYaw < -270.0f)
+		mYaw += 360.0f;
+
+	updateVector();
 }
 
 void Camera::setAspect(float value) noexcept
@@ -48,12 +54,7 @@ void Camera::setAspect(float value) noexcept
 
 glm::mat4 Camera::getView() const noexcept
 {
-	glm::mat4 rotation = glm::mat4(1.0f);
-	rotation = glm::rotate(rotation, glm::radians(mYaw), glm::vec3{ 0.0f, 1.0f, 0.0f });
-	rotation = glm::rotate(rotation, glm::radians(mPitch), glm::vec3{ 1.0f, 0.0f, 0.0f });
-
-	glm::vec3 lookAtVector = rotation * mFixedFront;
-	return glm::lookAt(mPosition, mPosition + lookAtVector, mFixedWorldUp);
+	return glm::lookAt(mPosition, mPosition + mFront, mFixedWorldUp);
 }
 
 glm::mat4 Camera::getProjection() const noexcept
@@ -61,9 +62,38 @@ glm::mat4 Camera::getProjection() const noexcept
 	return glm::perspective(mFovy, mAspect, mNear, mFar);
 }
 
+void Camera::genCtrlGui() noexcept
+{
+	if (ImGui::Begin("Camera")) {
+		ImGui::Text("Location");
+		ImGui::SliderFloat("X", &mPosition.x, -80.0f, 80.0f, "%.1f");
+		ImGui::SliderFloat("Y", &mPosition.y, -80.0f, 80.0f, "%.1f");
+		ImGui::SliderFloat("Z", &mPosition.z, -80.0f, 80.0f, "%.1f");
+		ImGui::Text("Rotation");
+		ImGui::SliderFloat("Pitch", &mPitch, -89.0f, 89.0f);
+		ImGui::SliderFloat("Yaw", &mYaw, -270.0f, 90.0f);
+	}
+	ImGui::End();
+
+	return;
+}
+
 void Camera::reset() noexcept
 {
 	mPosition = { 0.0f, 0.0f, 3.0f };
 	mPitch = 0.0f;
-	mYaw = 0.0f;
+	mYaw = -90.0f;
+}
+
+void Camera::updateVector() noexcept
+{
+	// calculate the new Front vector
+	glm::vec3 front;
+	front.x = cos(glm::radians(mYaw)) * cos(glm::radians(mPitch));
+	front.y = sin(glm::radians(mPitch));
+	front.z = sin(glm::radians(mYaw)) * cos(glm::radians(mPitch));
+	mFront = glm::normalize(front);
+	// also re-calculate the Right and Up vector
+	mRight = glm::normalize(glm::cross(mFront, mFixedWorldUp));  // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+	mUp = glm::normalize(glm::cross(mRight, mFront));
 }

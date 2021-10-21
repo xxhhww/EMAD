@@ -1,5 +1,8 @@
 #pragma once
 #include "GWin/GWin.h"
+#include "Object/Camera/Camera.h"
+
+#include <memory>
 
 class App {
 public:
@@ -8,5 +11,8 @@ public:
 
 	int run();
 private:
+	void handleInput(float dt) noexcept;
+private:
 	GWin mWindow;
+	std::shared_ptr<Camera> mCamera;
 };

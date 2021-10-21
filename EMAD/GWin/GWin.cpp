@@ -30,6 +30,7 @@ GWin::GWin(int width, int height, const std::string& name)
     glfwMakeContextCurrent(mWindow);
     // 设置用户数据指针
     glfwSetWindowUserPointer(mWindow, this);
+
     // 设置窗口大小改变时的回调函数
     glfwSetFramebufferSizeCallback(mWindow,
         [](GLFWwindow* window, int width, int height) {
@@ -44,11 +45,34 @@ GWin::GWin(int width, int height, const std::string& name)
         [](GLFWwindow* window, double xpos, double ypos) {
             GWin* userData = (GWin*)glfwGetWindowUserPointer(window);
             const auto lastPos = userData->getCursorPos();
-            double offsetX = lastPos.first - xpos;
+            double offsetX = xpos - lastPos.first;
             double offsetY = lastPos.second - ypos;
 
             userData->setCursorPos(xpos, ypos);
             userData->setCursorOffset(offsetX, offsetY);
+        }
+    );
+    // 设置空格键来控制光标的启用
+    glfwSetKeyCallback(mWindow,
+        [](GLFWwindow* window, int key, int scancode, int action, int mods) {
+            GWin* userData = (GWin*)glfwGetWindowUserPointer(window);
+            if (action == GLFW_PRESS) {
+                switch (key)
+                {
+                case GLFW_KEY_SPACE:
+                    if (userData->isCursorEnabled()) {
+                        userData->disableCursor();
+                        glfwSetInputMode(userData->window(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+                    }
+                    else {
+                        userData->enableCursor();
+                        glfwSetInputMode(userData->window(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+                    }
+                    break;
+                default:
+                    break;
+                }
+            }
         }
     );
 

@@ -21,6 +21,11 @@ public:
 
 	std::pair<double, double> getCursorOffset() const noexcept;
 	void setCursorOffset(double offsetX, double offsetY) noexcept;
+
+	bool isCursorEnabled() const noexcept { return mCursorEnabled; }
+	void enableCursor() noexcept { mCursorEnabled = true; }
+	void disableCursor() noexcept { mCursorEnabled = false; }
+
 private:
 
 private:
@@ -35,4 +40,6 @@ private:
 	// cursor offset
 	double mOffsetX;
 	double mOffsetY;
+
+	bool mCursorEnabled;
 };
