@@ -1,6 +1,7 @@
 #include "Renderer.h"
-#include "Object/Geometry/TestCube.h"
+#include "Object/Drawable/TestCube.h"
 #include "Object/Camera/Camera.h"
+#include "Object/Light/PointLight.h"
 
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_glfw.h"
@@ -26,6 +27,8 @@ App::~App()
 int App::run()
 {
     TestCube testCube;
+    PointLight testLight;
+
     glm::vec3 cubePositions[] = {
         glm::vec3(0.0f,  0.0f,  0.0f),
         glm::vec3(2.0f,  5.0f, -15.0f),
@@ -43,6 +46,9 @@ int App::run()
     float lastFrame = 0.0f; // 上一帧的时间
     while (!glfwWindowShouldClose(mWindow.window()))
     {
+        float aspect = (float)mWindow.getRectangle().first / (float)mWindow.getRectangle().second;
+        mCamera->setAspect(aspect);
+
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
@@ -53,6 +59,7 @@ int App::run()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        /*
         for (size_t i = 0; i < 10; i++) {
             // 绑定顶点着色器的常量缓存
             // model trans
@@ -64,7 +71,10 @@ int App::run()
             float aspect = (float)mWindow.getRectangle().first / (float)mWindow.getRectangle().second;  
             mCamera->setAspect(aspect);
             testCube.draw(model, mCamera->getView(), mCamera->getProjection());
-        }
+        }*/
+
+        glm::mat4 model = glm::mat4(1.0f);
+        testLight.draw(model, mCamera->getView(), mCamera->getProjection());
 
 
         //创建imgui

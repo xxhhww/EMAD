@@ -36,7 +36,7 @@
     <ClCompile Include="stb_image.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Object\Geometry\TestCube.cpp">
+    <ClCompile Include="Object\Drawable\TestCube.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Object\EObject.cpp">
@@ -66,6 +66,9 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Object\Light\PointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GWin\GWin.h">
@@ -83,7 +86,7 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Object\Geometry\TestCube.h">
+    <ClInclude Include="Object\Drawable\TestCube.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Object\EObject.h">
@@ -119,9 +122,20 @@
     <ClInclude Include="ImGui\imgui_impl_opengl3_loader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Object\Light\PointLight.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Geometry\Sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EMath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\test_vs.vert" />
     <None Include="Shader\test_fs.frag" />
+    <None Include="Shader\PointLight_vs.vert" />
+    <None Include="Shader\PointLight_fs.frag" />
   </ItemGroup>
 </Project>

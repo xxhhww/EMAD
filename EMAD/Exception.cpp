@@ -24,7 +24,7 @@ std::string BaseException::getBaseErrorStr() const noexcept
 {
 	std::ostringstream oss;
 	oss << "[File] " << mFile << std::endl
-		<< "[Line] " << mLine;
+		<< "[Line] " << mLine << std::endl;
 	return oss.str();
 }
 

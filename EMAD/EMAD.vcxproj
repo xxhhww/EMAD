@@ -168,12 +168,14 @@
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="Object\Camera\Camera.cpp" />
     <ClCompile Include="Object\EObject.cpp" />
-    <ClCompile Include="Object\Geometry\TestCube.cpp" />
+    <ClCompile Include="Object\Drawable\TestCube.cpp" />
+    <ClCompile Include="Object\Light\PointLight.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shader\ShaderProgram.cpp" />
     <ClCompile Include="stb_image.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EMath.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="GWin\GWin.h" />
     <ClInclude Include="ImGui\imconfig.h" />
@@ -187,12 +189,16 @@
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Object\Camera\Camera.h" />
     <ClInclude Include="Object\EObject.h" />
-    <ClInclude Include="Object\Geometry\TestCube.h" />
+    <ClInclude Include="Object\Drawable\TestCube.h" />
+    <ClInclude Include="Object\Geometry\Sphere.h" />
+    <ClInclude Include="Object\Light\PointLight.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader\ShaderProgram.h" />
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shader\PointLight_fs.frag" />
+    <None Include="Shader\PointLight_vs.vert" />
     <None Include="Shader\test_fs.frag" />
     <None Include="Shader\test_vs.vert" />
   </ItemGroup>

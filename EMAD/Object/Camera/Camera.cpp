@@ -3,7 +3,6 @@
 
 #include <iostream>
 
-#include <DirectXMath.h>
 #include <algorithm>
 
 Camera::Camera()
