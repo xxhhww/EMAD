@@ -1,11 +1,21 @@
 #pragma once
+#include "../Drawable/Drawable.hpp"
 
-#include "../EObject.h"
-
-class PointLight : public EObject {
+class Program;
+class PointLight : public Drawable{
 public:
 	PointLight();
 
-	virtual void draw(glm::mat4 model, glm::mat4 view, glm::mat4 projection) override;
+	virtual void genCtrlGui() noexcept override;
+	void draw(glm::mat4 view, glm::mat4 projection);
+
+	const glm::vec3& getPosition() const { return mPosition; }
+	const glm::vec3& getColor() const { return mColor; }
+	const float& getAmbient() const { return mAmbient; }
+	const float& getSpecular() const { return mSpecular; }
+
 private:
+	glm::vec3 mColor{ 1.0f, 1.0f, 1.0f };
+	float mAmbient{ 0.3f };
+	float mSpecular{ 0.5f };
 };

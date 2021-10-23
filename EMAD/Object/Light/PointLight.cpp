@@ -4,6 +4,8 @@
 
 PointLight::PointLight()
 {
+	mPosition = { 2.0f, 2.0f, -2.0f };
+	mScaling = { 0.1f, 0.1f, 0.1f };
 	// create shader program
 	mProgram = std::make_shared<Program>("Shader/PointLight_vs.vert", "Shader/PointLight_fs.frag");
 
@@ -35,11 +37,28 @@ PointLight::PointLight()
 	glBindVertexArray(0);
 }
 
-void PointLight::draw(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
+void PointLight::genCtrlGui() noexcept
+{
+	if (ImGui::Begin("PointLight")) {
+		ImGui::Text("Position");
+		ImGui::SliderFloat("Pos-X", &mPosition.x, -10.0f, 10.0f, "%.1f");
+		ImGui::SliderFloat("Pos-Y", &mPosition.y, -10.0f, 10.0f, "%.1f");
+		ImGui::SliderFloat("Pos-Z", &mPosition.z, -10.0f, 10.0f, "%.1f");
+
+		ImGui::Text("Light");
+		ImGui::ColorEdit3("Diffuse", &mColor.x);
+		ImGui::SliderFloat("Ambient", &mAmbient, 0.1f, 1.0f, "%.1f");
+		ImGui::SliderFloat("Specular", &mSpecular, 0.1f, 1.0f, "%.1f");
+	}
+	ImGui::End();
+}
+
+void PointLight::draw(glm::mat4 view, glm::mat4 projection)
 {
 	mProgram->activate();
 	// 绑定顶点着色器的常量缓存
 	// bind model trans
+	glm::mat4 model = genModelTrans();
 	mProgram->setMatrix("model", glm::value_ptr(model));
 	// bind view trans
 	mProgram->setMatrix("view", glm::value_ptr(view));

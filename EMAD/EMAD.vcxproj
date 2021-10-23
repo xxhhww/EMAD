@@ -167,8 +167,8 @@
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="Object\Camera\Camera.cpp" />
-    <ClCompile Include="Object\EObject.cpp" />
     <ClCompile Include="Object\Drawable\TestCube.cpp" />
+    <ClCompile Include="Object\Drawable\TestCube2.cpp" />
     <ClCompile Include="Object\Light\PointLight.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shader\ShaderProgram.cpp" />
@@ -188,6 +188,8 @@
     <ClInclude Include="ImGui\imstb_textedit.h" />
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Object\Camera\Camera.h" />
+    <ClInclude Include="Object\Drawable\Drawable.hpp" />
+    <ClInclude Include="Object\Drawable\TestCube2.h" />
     <ClInclude Include="Object\EObject.h" />
     <ClInclude Include="Object\Drawable\TestCube.h" />
     <ClInclude Include="Object\Geometry\Sphere.h" />
@@ -197,6 +199,8 @@
     <ClInclude Include="stb_image.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shader\LightShader_fs.frag" />
+    <None Include="Shader\LightShader_vs.vert" />
     <None Include="Shader\PointLight_fs.frag" />
     <None Include="Shader\PointLight_vs.vert" />
     <None Include="Shader\test_fs.frag" />

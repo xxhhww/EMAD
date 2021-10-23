@@ -4,6 +4,8 @@
 
 #include <memory>
 
+class TestCube2;
+class PointLight;
 class App {
 public:
 	App(int width, int height, const std::string& name = "LearnOpenGL") noexcept;
@@ -12,7 +14,10 @@ public:
 	int run();
 private:
 	void handleInput(float dt) noexcept;
+	void genCtrlGui() const noexcept;
 private:
 	GWin mWindow;
 	std::shared_ptr<Camera> mCamera;
+	std::shared_ptr<TestCube2> mTestCube;
+	std::shared_ptr<PointLight> mPointLight;
 };

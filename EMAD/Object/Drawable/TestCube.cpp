@@ -133,7 +133,7 @@ TestCube::TestCube()
     mProgram->setInt("ourTexture2", 1);
 }
 
-void TestCube::draw(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
+void TestCube::draw(glm::mat4 view, glm::mat4 projection)
 {
     mProgram->activate();
     // 激活并绑定纹理单元(texture uint)
@@ -143,7 +143,8 @@ void TestCube::draw(glm::mat4 model, glm::mat4 view, glm::mat4 projection)
     glBindTexture(GL_TEXTURE_2D, texture2);
 
     // 绑定顶点着色器的常量缓存
-    // bind model trans
+    // bind model trans'
+    glm::mat4 model = genModelTrans();
     mProgram->setMatrix("model", glm::value_ptr(model));
     // bind view trans
     mProgram->setMatrix("view", glm::value_ptr(view));

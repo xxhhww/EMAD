@@ -1,7 +1,12 @@
 #include "Renderer.h"
-#include "Object/Drawable/TestCube.h"
+
+#include "Shader/ShaderProgram.h"
+
 #include "Object/Camera/Camera.h"
 #include "Object/Light/PointLight.h"
+
+#include "Object/Drawable/TestCube.h"
+#include "Object/Drawable/TestCube2.h"
 
 #include "ImGui/imgui.h"
 #include "ImGui/imgui_impl_glfw.h"
@@ -17,7 +22,10 @@ App::App(int width, int height, const std::string& name) noexcept
 	:mWindow(width, height, name){
     // 启东深度缓冲测试
     glEnable(GL_DEPTH_TEST);
+
     mCamera = std::make_shared<Camera>();
+    mTestCube = std::make_shared<TestCube2>();
+    mPointLight = std::make_shared<PointLight>();
 }
 
 App::~App()
@@ -26,21 +34,7 @@ App::~App()
 
 int App::run()
 {
-    TestCube testCube;
-    PointLight testLight;
-
-    glm::vec3 cubePositions[] = {
-        glm::vec3(0.0f,  0.0f,  0.0f),
-        glm::vec3(2.0f,  5.0f, -15.0f),
-        glm::vec3(-1.5f, -2.2f, -2.5f),
-        glm::vec3(-3.8f, -2.0f, -12.3f),
-        glm::vec3(2.4f, -0.4f, -3.5f),
-        glm::vec3(-1.7f,  3.0f, -7.5f),
-        glm::vec3(1.3f, -2.0f, -2.5f),
-        glm::vec3(1.5f,  2.0f, -2.5f),
-        glm::vec3(1.5f,  0.2f, -1.5f),
-        glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
+    std::shared_ptr<Program> LightShaderPtr = std::make_shared<Program>("Shader/LightShader_vs.vert", "Shader/LightShader_fs.frag");
 
     float deltaTime = 0.0f; // 当前帧与上一帧的时间差
     float lastFrame = 0.0f; // 上一帧的时间
@@ -48,49 +42,28 @@ int App::run()
     {
         float aspect = (float)mWindow.getRectangle().first / (float)mWindow.getRectangle().second;
         mCamera->setAspect(aspect);
-
         float currentFrame = glfwGetTime();
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-
         handleInput(deltaTime);
-
         // clear buffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        /*
-        for (size_t i = 0; i < 10; i++) {
-            // 绑定顶点着色器的常量缓存
-            // model trans
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i;
-            model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(1.0f, 0.3f, 0.5f));
-            // projection trans
-            float aspect = (float)mWindow.getRectangle().first / (float)mWindow.getRectangle().second;  
-            mCamera->setAspect(aspect);
-            testCube.draw(model, mCamera->getView(), mCamera->getProjection());
-        }*/
+        glm::vec3 objectColor{ 0.3f, 0.7f, 0.4f };
 
-        glm::mat4 model = glm::mat4(1.0f);
-        testLight.draw(model, mCamera->getView(), mCamera->getProjection());
+        mPointLight->draw(mCamera->getView(), mCamera->getProjection());
+        LightShaderPtr->activate();
+        LightShaderPtr->setVec3("lightPosInView", mCamera->getView() * glm::vec4{ mPointLight->getPosition(), 1.0f });
+        LightShaderPtr->setVec3("lightColor", mPointLight->getColor());
+        LightShaderPtr->setFloat("lightAmbient", mPointLight->getAmbient());
+        LightShaderPtr->setFloat("lightSpecular", mPointLight->getSpecular());
+        LightShaderPtr->setVec3("objectColor", objectColor);
 
+        mTestCube->loadShaderProgram(LightShaderPtr);
+        mTestCube->draw(mCamera->getView(), mCamera->getProjection());
 
-        //创建imgui
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        //bool isShow = true;
-        //ImGui::ShowDemoWindow(&isShow);
-
-        mCamera->genCtrlGui();
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-
+        genCtrlGui();
         glfwSwapBuffers(mWindow.window());
         glfwPollEvents();
     }
@@ -118,4 +91,22 @@ void App::handleInput(float dt) noexcept
         mWindow.setCursorOffset(0.0f, 0.0f);
         mCamera->rotate(cursorOffset.first, cursorOffset.second);
     }
+}
+
+void App::genCtrlGui() const noexcept
+{
+    //创建imgui
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplGlfw_NewFrame();
+    ImGui::NewFrame();
+
+    //bool isShow = true;
+    //ImGui::ShowDemoWindow(&isShow);
+
+    mCamera->genCtrlGui();
+    mPointLight->genCtrlGui();
+    mTestCube->genCtrlGui();
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

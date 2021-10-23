@@ -1,9 +1,11 @@
 #pragma once
+#include "../EObject.h"
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-class Camera {
+class Camera : public EObject{
 public:
 	Camera();
 
@@ -14,7 +16,7 @@ public:
 	glm::mat4 getView() const noexcept;
 	glm::mat4 getProjection() const noexcept;
 
-	void genCtrlGui() noexcept;
+	virtual void genCtrlGui() noexcept override;
 private:
 	void reset() noexcept;
 	void updateVector() noexcept;
