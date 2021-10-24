@@ -16,6 +16,10 @@
 #include "ImGui/imgui_impl_glfw.h"
 #include "ImGui/imgui_impl_opengl3.h"
 
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -31,6 +35,17 @@ App::App(int width, int height, const std::string& name) noexcept
     mTestCube = std::make_shared<TestCube2>();
     mPointLight = std::make_shared<PointLight>();
     mDirectLight = std::make_shared<DirectLight>();
+
+    // Create an instance of the Importer class
+    Assimp::Importer importer;
+
+    // And have it read the given file with some example postprocessing
+    // Usually - if speed is not the most important aspect for you - you'll
+    // probably to request more postprocessing than we do in this example.
+    const aiScene* scene = importer.ReadFile("Resource/Models/suzanne.obj",
+        aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
+
+    std::cout << scene->mMeshes[0]->mNumVertices << std::endl;
 }
 
 App::~App()
