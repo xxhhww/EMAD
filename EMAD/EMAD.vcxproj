@@ -169,6 +169,7 @@
     <ClCompile Include="Object\Camera\Camera.cpp" />
     <ClCompile Include="Object\Drawable\TestCube.cpp" />
     <ClCompile Include="Object\Drawable\TestCube2.cpp" />
+    <ClCompile Include="Object\Light\DirectLight.cpp" />
     <ClCompile Include="Object\Light\PointLight.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shader\ShaderProgram.cpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="Object\EObject.h" />
     <ClInclude Include="Object\Drawable\TestCube.h" />
     <ClInclude Include="Object\Geometry\Sphere.h" />
+    <ClInclude Include="Object\Light\DirectLight.h" />
     <ClInclude Include="Object\Light\PointLight.h" />
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader\ShaderProgram.h" />

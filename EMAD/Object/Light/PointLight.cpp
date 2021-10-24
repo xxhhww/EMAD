@@ -47,8 +47,8 @@ void PointLight::genCtrlGui() noexcept
 
 		ImGui::Text("Light");
 		ImGui::ColorEdit3("Diffuse", &mColor.x);
-		ImGui::SliderFloat("Ambient", &mAmbient, 0.1f, 1.0f, "%.1f");
-		ImGui::SliderFloat("Specular", &mSpecular, 0.1f, 1.0f, "%.1f");
+		ImGui::SliderFloat("Ambient", &mAmbient, 0.0f, 1.0f, "%.1f");
+		ImGui::SliderFloat("Specular", &mSpecular, 0.0f, 1.0f, "%.1f");
 	}
 	ImGui::End();
 }

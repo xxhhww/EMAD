@@ -6,6 +6,7 @@
 
 class TestCube2;
 class PointLight;
+class DirectLight;
 class App {
 public:
 	App(int width, int height, const std::string& name = "LearnOpenGL") noexcept;
@@ -20,4 +21,5 @@ private:
 	std::shared_ptr<Camera> mCamera;
 	std::shared_ptr<TestCube2> mTestCube;
 	std::shared_ptr<PointLight> mPointLight;
+	std::shared_ptr<DirectLight> mDirectLight;
 };

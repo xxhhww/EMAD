@@ -4,6 +4,7 @@
 
 #include "Object/Camera/Camera.h"
 #include "Object/Light/PointLight.h"
+#include "Object/Light/DirectLight.h"
 
 #include "Object/Drawable/TestCube.h"
 #include "Object/Drawable/TestCube2.h"
@@ -29,6 +30,7 @@ App::App(int width, int height, const std::string& name) noexcept
     mCamera = std::make_shared<Camera>();
     mTestCube = std::make_shared<TestCube2>();
     mPointLight = std::make_shared<PointLight>();
+    mDirectLight = std::make_shared<DirectLight>();
 }
 
 App::~App()
@@ -103,11 +105,16 @@ int App::run()
 
         mPointLight->draw(mCamera->getView(), mCamera->getProjection());
         LightShaderPtr->activate();
-        // light
+        // point light
         LightShaderPtr->setVec3("pointLight.posInView", glm::vec3{ mCamera->getView() * glm::vec4{ mPointLight->getPosition(), 1.0f } });
         LightShaderPtr->setVec3("pointLight.diffuse", mPointLight->getColor());
         LightShaderPtr->setFloat("pointLight.ambient", mPointLight->getAmbient());
         LightShaderPtr->setFloat("pointLight.specular", mPointLight->getSpecular());
+        // direct light
+        LightShaderPtr->setVec3("directLight.direction", glm::vec3{ mCamera->getView() * glm::vec4{ mDirectLight->getDirection(), 0.0f } });
+        LightShaderPtr->setVec3("directLight.diffuse", mDirectLight->getColor());
+        LightShaderPtr->setFloat("directLight.ambient", mDirectLight->getAmbient());
+        LightShaderPtr->setFloat("directLight.specular", mDirectLight->getSpecular());
         // material
         LightShaderPtr->setFloat("material.shininess", 32.0f);
         glActiveTexture(GL_TEXTURE0);
@@ -160,6 +167,7 @@ void App::genCtrlGui() const noexcept
 
     mCamera->genCtrlGui();
     mPointLight->genCtrlGui();
+    mDirectLight->genCtrlGui();
     mTestCube->genCtrlGui();
 
     ImGui::Render();

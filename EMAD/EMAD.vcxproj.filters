@@ -69,6 +69,9 @@
     <ClCompile Include="Object\Drawable\TestCube2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Object\Light\DirectLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GWin\GWin.h">
@@ -135,6 +138,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Object\Drawable\TestCube2.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Light\DirectLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
