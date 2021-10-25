@@ -167,7 +167,9 @@
     <ClCompile Include="ImGui\imgui_tables.cpp" />
     <ClCompile Include="ImGui\imgui_widgets.cpp" />
     <ClCompile Include="Object\Camera\Camera.cpp" />
-    <ClCompile Include="Object\Drawable\TestCube.cpp" />
+    <ClCompile Include="Object\Drawable\Model\Mesh.cpp" />
+    <ClCompile Include="Object\Drawable\Model\Model.cpp" />
+    <ClCompile Include="Object\Drawable\Model\Node.cpp" />
     <ClCompile Include="Object\Drawable\TestCube2.cpp" />
     <ClCompile Include="Object\Light\DirectLight.cpp" />
     <ClCompile Include="Object\Light\PointLight.cpp" />
@@ -190,9 +192,11 @@
     <ClInclude Include="ImGui\imstb_truetype.h" />
     <ClInclude Include="Object\Camera\Camera.h" />
     <ClInclude Include="Object\Drawable\Drawable.hpp" />
+    <ClInclude Include="Object\Drawable\Model\Mesh.h" />
+    <ClInclude Include="Object\Drawable\Model\Model.h" />
+    <ClInclude Include="Object\Drawable\Model\Node.h" />
     <ClInclude Include="Object\Drawable\TestCube2.h" />
     <ClInclude Include="Object\EObject.h" />
-    <ClInclude Include="Object\Drawable\TestCube.h" />
     <ClInclude Include="Object\Geometry\Sphere.h" />
     <ClInclude Include="Object\Light\DirectLight.h" />
     <ClInclude Include="Object\Light\PointLight.h" />

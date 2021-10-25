@@ -71,17 +71,12 @@ TestCube2::TestCube2()
     glBindVertexArray(0);
 }
 
-void TestCube2::draw(glm::mat4 view, glm::mat4 projection)
+void TestCube2::draw(std::shared_ptr<Program> program) noexcept
 {
-    mProgram->activate();
+    program->activate();
     // 绑定顶点着色器的常量缓存
     // bind model trans
-    glm::mat4 model = genModelTrans();
-    mProgram->setMatrix("model", glm::value_ptr(model));
-    // bind view trans
-    mProgram->setMatrix("view", glm::value_ptr(view));
-    // bind projection trans
-    mProgram->setMatrix("projection", glm::value_ptr(projection));
+    program->setMatrix("model", genModelTrans());
 
     glBindVertexArray(mVAO);
 

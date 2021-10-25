@@ -2,7 +2,7 @@
 #include "../../Shader/ShaderProgram.h"
 #include "../../Exception.h"
 #include "../../stb_image.h"
-
+/*
 TestCube::TestCube()
 {
     // create shader program
@@ -156,3 +156,4 @@ void TestCube::draw(glm::mat4 view, glm::mat4 projection)
     glDrawArrays(GL_TRIANGLES, 0, 36);
     //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 }
+*/

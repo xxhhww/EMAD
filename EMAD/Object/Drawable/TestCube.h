@@ -1,6 +1,7 @@
 #pragma once
 #include "Drawable.hpp"
 
+/*
 class TestCube : public Drawable{
 public:
 	TestCube();
@@ -10,3 +11,4 @@ private:
 	unsigned int texture1;
 	unsigned int texture2;
 };
+*/

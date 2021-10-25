@@ -4,8 +4,6 @@
 
 #include <glad/glad.h>
 
-#include <memory>
-
 class EObject {
 public:
 	virtual ~EObject() {}

@@ -7,7 +7,7 @@ public:
 	PointLight();
 
 	virtual void genCtrlGui() noexcept override;
-	void draw(glm::mat4 view, glm::mat4 projection);
+	virtual void draw(std::shared_ptr<Program> program) noexcept override;
 
 	const glm::vec3& getPosition() const { return mPosition; }
 	const glm::vec3& getColor() const { return mColor; }

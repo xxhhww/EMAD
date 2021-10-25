@@ -6,5 +6,5 @@ class TestCube2 : public Drawable {
 public:
 	TestCube2();
 
-	virtual void draw(glm::mat4 view, glm::mat4 projection) override;
+	virtual void draw(std::shared_ptr<Program> program) noexcept override;
 };

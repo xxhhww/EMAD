@@ -1,17 +1,15 @@
 #pragma once
 
 #include "../EObject.h"
+#include "../../Shader/ShaderProgram.h"
+
+#include <memory>
 
 class Program;
 class Drawable : public EObject {
 public:
 	virtual ~Drawable() {
 		glDeleteVertexArrays(1, &mVAO);
-	}
-
-	// 装载着色器
-	void loadShaderProgram(std::shared_ptr<Program> program) { 
-		mProgram = program; 
 	}
 
 	// 生成控制窗口
@@ -35,7 +33,15 @@ public:
 		ImGui::End();
 	}
 
-	virtual void draw(glm::mat4 view, glm::mat4 projection) = 0;
+	virtual void draw(std::shared_ptr<Program> program) noexcept {
+		program->activate();
+		// 绑定顶点着色器的常量缓存
+		// bind model trans
+		program->setMatrix("model", genModelTrans());
+
+		glBindVertexArray(mVAO);
+		glDrawElements(GL_TRIANGLES, mIndexSize, GL_UNSIGNED_INT, 0);
+	}
 
 protected:
 	// 由控制信息生成模型变换矩阵
@@ -55,9 +61,6 @@ protected:
 	// 顶点属性信息
 	unsigned int mVAO;
 	unsigned int mIndexSize;
-
-	// 材质信息
-	std::shared_ptr<Program> mProgram;
 
 	// 控制信息
 	glm::vec3 mPosition{ 0.0f, 0.0f, 0.0f }; // 位置数据

@@ -88,7 +88,7 @@ void Program::setVec3(const std::string& name, const glm::vec3& value) const noe
 	glUniform3fv(glGetUniformLocation(mProgram, name.c_str()), 1, &value[0]);
 }
 
-void Program::setMatrix(const std::string& name, float* value) const noexcept
+void Program::setMatrix(const std::string& name, const glm::mat4& value) const noexcept
 {
-	glUniformMatrix4fv(glGetUniformLocation(mProgram, name.c_str()), 1, GL_FALSE, value);
+	glUniformMatrix4fv(glGetUniformLocation(mProgram, name.c_str()), 1, GL_FALSE, &value[0][0]);
 }

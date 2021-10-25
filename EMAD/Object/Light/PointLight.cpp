@@ -6,8 +6,6 @@ PointLight::PointLight()
 {
 	mPosition = { 2.0f, 2.0f, -2.0f };
 	mScaling = { 0.1f, 0.1f, 0.1f };
-	// create shader program
-	mProgram = std::make_shared<Program>("Shader/PointLight_vs.vert", "Shader/PointLight_fs.frag");
 
 	// vertices
 	auto vertexData = Sphere::Make();
@@ -53,19 +51,13 @@ void PointLight::genCtrlGui() noexcept
 	ImGui::End();
 }
 
-void PointLight::draw(glm::mat4 view, glm::mat4 projection)
+void PointLight::draw(std::shared_ptr<Program> program) noexcept
 {
-	mProgram->activate();
+	program->activate();
 	// 绑定顶点着色器的常量缓存
 	// bind model trans
-	glm::mat4 model = genModelTrans();
-	mProgram->setMatrix("model", glm::value_ptr(model));
-	// bind view trans
-	mProgram->setMatrix("view", glm::value_ptr(view));
-	// bind projection trans
-	mProgram->setMatrix("projection", glm::value_ptr(projection));
+	program->setMatrix("model", genModelTrans());
 
 	glBindVertexArray(mVAO);
-
 	glDrawElements(GL_TRIANGLES, mIndexSize, GL_UNSIGNED_INT, 0);
 }

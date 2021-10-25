@@ -8,6 +8,7 @@
 
 #include "Object/Drawable/TestCube.h"
 #include "Object/Drawable/TestCube2.h"
+#include "Object/Drawable/Model/Model.h"
 
 #include "stb_image.h"
 #include "Exception.h"
@@ -16,15 +17,11 @@
 #include "ImGui/imgui_impl_glfw.h"
 #include "ImGui/imgui_impl_opengl3.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <iostream>
+#include <memory>
 
 App::App(int width, int height, const std::string& name) noexcept
 	:mWindow(width, height, name){
@@ -35,17 +32,6 @@ App::App(int width, int height, const std::string& name) noexcept
     mTestCube = std::make_shared<TestCube2>();
     mPointLight = std::make_shared<PointLight>();
     mDirectLight = std::make_shared<DirectLight>();
-
-    // Create an instance of the Importer class
-    Assimp::Importer importer;
-
-    // And have it read the given file with some example postprocessing
-    // Usually - if speed is not the most important aspect for you - you'll
-    // probably to request more postprocessing than we do in this example.
-    const aiScene* scene = importer.ReadFile("Resource/Models/suzanne.obj",
-        aiProcess_Triangulate | aiProcess_JoinIdenticalVertices);
-
-    std::cout << scene->mMeshes[0]->mNumVertices << std::endl;
 }
 
 App::~App()
@@ -54,7 +40,9 @@ App::~App()
 
 int App::run()
 {
+    std::shared_ptr<Program> PointLightShaderPtr = std::make_shared<Program>("Shader/PointLight_vs.vert", "Shader/PointLight_fs.frag");
     std::shared_ptr<Program> LightShaderPtr = std::make_shared<Program>("Shader/LightShader_vs.vert", "Shader/LightShader_fs.frag");
+    std::shared_ptr<Model> testModel = std::make_shared<Model>("Resource/Models/nano_textured/nanosuit.obj");
 
     float deltaTime = 0.0f; // 当前帧与上一帧的时间差
     float lastFrame = 0.0f; // 上一帧的时间
@@ -118,8 +106,15 @@ int App::run()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        mPointLight->draw(mCamera->getView(), mCamera->getProjection());
+        PointLightShaderPtr->activate();
+        PointLightShaderPtr->setMatrix("view", mCamera->getView());
+        PointLightShaderPtr->setMatrix("projection", mCamera->getProjection());
+        mPointLight->draw(PointLightShaderPtr);
+
         LightShaderPtr->activate();
+        // view / projection
+        LightShaderPtr->setMatrix("view", mCamera->getView());
+        LightShaderPtr->setMatrix("projection", mCamera->getProjection());
         // point light
         LightShaderPtr->setVec3("pointLight.posInView", glm::vec3{ mCamera->getView() * glm::vec4{ mPointLight->getPosition(), 1.0f } });
         LightShaderPtr->setVec3("pointLight.diffuse", mPointLight->getColor());
@@ -137,8 +132,9 @@ int App::run()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texSepcular);
         // load shaderprogram
-        mTestCube->loadShaderProgram(LightShaderPtr);
-        mTestCube->draw(mCamera->getView(), mCamera->getProjection());
+        mTestCube->draw(LightShaderPtr);
+
+        testModel->draw(PointLightShaderPtr);
 
         genCtrlGui();
         glfwSwapBuffers(mWindow.window());
@@ -177,13 +173,20 @@ void App::genCtrlGui() const noexcept
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
 
-    //bool isShow = true;
-    //ImGui::ShowDemoWindow(&isShow);
+    static bool isShow = true;
+    if(isShow)
+        ImGui::ShowDemoWindow(&isShow);
 
     mCamera->genCtrlGui();
     mPointLight->genCtrlGui();
     mDirectLight->genCtrlGui();
     mTestCube->genCtrlGui();
+
+    static bool isOpen = true;
+    if (isOpen) {
+        ImGui::Begin("test", &isOpen, ImGuiWindowFlags_MenuBar);
+        ImGui::End();
+    }
 
     ImGui::Render();
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
