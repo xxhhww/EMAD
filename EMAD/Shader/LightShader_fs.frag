@@ -30,6 +30,7 @@ struct Material{
     float shininess;
 };
 uniform Material material;
+uniform bool hasSpec;
 // º¯ÊýÉùÃ÷
 vec3 calcPointLight(PointLight light, vec3 pos, vec3 normal);
 vec3 calcDirecLight(DirectLight light, vec3 pos, vec3 normal);
@@ -39,7 +40,8 @@ void main()
     vec3 plColor = calcPointLight(pointLight, posInView, normalInView);
     vec3 dlColor = calcDirecLight(directLight, posInView, normalInView);
 
-    FragColor = vec4(plColor + dlColor, 1.0f);
+    //FragColor = texture(material.diffuse, texcoord);
+    FragColor = vec4((plColor + dlColor), 1.0f);
 }
 
 vec3 calcPointLight(PointLight light, vec3 pos, vec3 normal){
@@ -63,11 +65,19 @@ vec3 calcPointLight(PointLight light, vec3 pos, vec3 normal){
     
     
     // calculate specular
-    vec3 viewDir = normalize(-pos);
-    vec3 reflectDir = reflect(-lightDir, normalizeN);
-    float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
-    vec3 specularColor = specularFactor * light.specular * texture(material.specular, texcoord).rgb * attenuation;
-
+    vec3 specularColor = vec3(0.0f, 0.0f, 0.0f);
+    if(hasSpec){
+        vec3 viewDir = normalize(-pos);
+        vec3 reflectDir = reflect(-lightDir, normalizeN);
+        float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+        specularColor = specularFactor * light.specular * texture(material.specular, texcoord).rgb * attenuation;
+    }
+    else{
+        vec3 viewDir = normalize(-pos);
+        vec3 reflectDir = reflect(-lightDir, normalizeN);
+        float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+        specularColor = specularFactor * light.specular * light.diffuse * attenuation;
+    }
     return ambientColor + diffuseColor + specularColor;
 }
 
@@ -82,10 +92,19 @@ vec3 calcDirecLight(DirectLight light, vec3 pos, vec3 normal){
     vec3 diffuseColor = diffuseFactor * light.diffuse * texture(material.diffuse, texcoord).rgb;
     
     // calculate specular
-    vec3 viewDir = normalize(-pos);
-    vec3 reflectDir = reflect(-lightDir, normalizeN);
-    float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
-    vec3 specularColor = specularFactor * light.specular * texture(material.specular, texcoord).rgb;
+    vec3 specularColor = vec3(0.0f, 0.0f, 0.0f);
+    if(hasSpec){
+        vec3 viewDir = normalize(-pos);
+        vec3 reflectDir = reflect(-lightDir, normalizeN);
+        float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+        specularColor = specularFactor * light.specular * texture(material.specular, texcoord).rgb;
+    }
+    else{
+        vec3 viewDir = normalize(-pos);
+        vec3 reflectDir = reflect(-lightDir, normalizeN);
+        float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
+        specularColor = specularFactor * light.specular * light.diffuse;
+    }
 
     return ambientColor + diffuseColor + specularColor;
 }

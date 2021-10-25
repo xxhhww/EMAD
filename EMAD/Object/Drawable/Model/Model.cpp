@@ -9,6 +9,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#include <iostream>
+
 Model::Model(const std::string& path)
 {
     Assimp::Importer import;
@@ -17,20 +19,23 @@ Model::Model(const std::string& path)
     if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode){
         THROW_INFO_EXCEPTION("Failed to load model");
     }
-
+    mDir = path.substr(0, path.find_last_of('/'));
     // load all meshs
     for (size_t i = 0; i < scene->mNumMeshes; i++) {
-        mMeshPtrs.emplace_back(processMesh(scene->mMeshes[i]));
-    }
+        aiMaterial* material = scene->mMaterials[scene->mMeshes[i]->mMaterialIndex];
+        aiString diffTexFileName;
+        material->GetTexture(aiTextureType_DIFFUSE, 0, &diffTexFileName);
 
-    mDir = path.substr(0, path.find_last_of('/'));
+        mMeshPtrs.emplace_back(processMesh(scene->mMeshes[i], scene));
+    }
     // process node
     mRootNodePtr = std::move(processNode(scene->mRootNode));
 }
 
 void Model::draw(std::shared_ptr<Program> program) noexcept
 {
-    mRootNodePtr->draw(program, glm::mat4{ 1.0f });
+    glm::mat4 modelTrans = glm::scale(glm::mat4{ 1.0f }, glm::vec3{ 1.0f });
+    mRootNodePtr->draw(program, modelTrans);
 }
 
 std::unique_ptr<Node> Model::processNode(aiNode* node) noexcept
@@ -49,7 +54,7 @@ std::unique_ptr<Node> Model::processNode(aiNode* node) noexcept
     return std::move(curNodePtr);
 }
 
-std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh) noexcept
+std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene) noexcept
 {
     struct Vertex {
         glm::vec3 Position;
@@ -73,8 +78,8 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh) noexcept
         normal.z = mesh->mNormals[i].z;
 
         if (mesh->mTextureCoords[0]) {
-            texcoord.x = mesh->mTextureCoords[0]->x;
-            texcoord.y = mesh->mTextureCoords[0]->y;
+            texcoord.x = mesh->mTextureCoords[0][i].x;
+            texcoord.y = mesh->mTextureCoords[0][i].y;
         }
         else {
             texcoord.x = 0;
@@ -116,5 +121,21 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh) noexcept
 
     glBindVertexArray(0);
 
-    return std::make_shared<Mesh>(VAO, indices.size());
+    std::shared_ptr<Mesh> rt = std::make_shared<Mesh>(VAO, indices.size());
+    // load materials
+    if (mesh->mMaterialIndex > 0) {
+        // material指向该网格的材质信息
+        aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
+        aiString diffTexFileName;
+        aiString specTexFileName;
+
+        material->GetTexture(aiTextureType_DIFFUSE, 0, &diffTexFileName);
+        rt->setDiffuseTex(Texture::Load(diffTexFileName.C_Str(), mDir), mDir + '/' + diffTexFileName.C_Str());
+
+        // 有高光贴图
+        if (material->GetTexture(aiTextureType_SPECULAR, 0, &specTexFileName) == aiReturn_SUCCESS) {
+            rt->setSpecularTex(Texture::Load(specTexFileName.C_Str(), mDir));
+        }
+    }
+    return rt;
 }

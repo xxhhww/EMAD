@@ -42,11 +42,13 @@ int App::run()
 {
     std::shared_ptr<Program> PointLightShaderPtr = std::make_shared<Program>("Shader/PointLight_vs.vert", "Shader/PointLight_fs.frag");
     std::shared_ptr<Program> LightShaderPtr = std::make_shared<Program>("Shader/LightShader_vs.vert", "Shader/LightShader_fs.frag");
-    std::shared_ptr<Model> testModel = std::make_shared<Model>("Resource/Models/nano_textured/nanosuit.obj");
+
+    std::shared_ptr<Model> testModel = std::make_shared<Model>("Resource/Models/nono/nanosuit.obj");
 
     float deltaTime = 0.0f; // 当前帧与上一帧的时间差
     float lastFrame = 0.0f; // 上一帧的时间
 
+    /*
     // 加载材质信息
     unsigned int texDiffuse, texSepcular;
     glGenTextures(1, &texDiffuse);
@@ -87,12 +89,7 @@ int App::run()
         THROW_INFO_EXCEPTION("Failed to create texture2D");
     }
     stbi_image_free(data);
-
-    // 设置采样器对应的纹理单元
-    LightShaderPtr->activate();
-    LightShaderPtr->setInt("material.diffuse", 0);
-    LightShaderPtr->setInt("material.specular", 1);
-
+    */
 
     while (!glfwWindowShouldClose(mWindow.window()))
     {
@@ -107,6 +104,7 @@ int App::run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         PointLightShaderPtr->activate();
+        PointLightShaderPtr->setBool("isSpec", false);
         PointLightShaderPtr->setMatrix("view", mCamera->getView());
         PointLightShaderPtr->setMatrix("projection", mCamera->getProjection());
         mPointLight->draw(PointLightShaderPtr);
@@ -127,14 +125,19 @@ int App::run()
         LightShaderPtr->setFloat("directLight.specular", mDirectLight->getSpecular());
         // material
         LightShaderPtr->setFloat("material.shininess", 32.0f);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texDiffuse);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, texSepcular);
-        // load shaderprogram
-        mTestCube->draw(LightShaderPtr);
+        //LightShaderPtr->setBool("hasSpec", true);
+        // 设置采样器对应的纹理单元
+        LightShaderPtr->setInt("material.diffuse", 0);
+        LightShaderPtr->setInt("material.specular", 1);
 
-        testModel->draw(PointLightShaderPtr);
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, texDiffuse);
+        //glActiveTexture(GL_TEXTURE1);
+        //glBindTexture(GL_TEXTURE_2D, texSepcular);
+        // load shaderprogram
+        //mTestCube->draw(LightShaderPtr);
+
+        testModel->draw(LightShaderPtr);
 
         genCtrlGui();
         glfwSwapBuffers(mWindow.window());
@@ -180,7 +183,7 @@ void App::genCtrlGui() const noexcept
     mCamera->genCtrlGui();
     mPointLight->genCtrlGui();
     mDirectLight->genCtrlGui();
-    mTestCube->genCtrlGui();
+    //mTestCube->genCtrlGui();
 
     static bool isOpen = true;
     if (isOpen) {

@@ -12,6 +12,7 @@ public:
 
 	void activate() const noexcept;
 
+	void setBool(const std::string& name, bool value) const noexcept;
 	void setInt(const std::string& name, int value) const noexcept;
 	void setFloat(const std::string& name, const float& value) const noexcept;
 	void setVec3(const std::string& name, const glm::vec3& value) const noexcept;
