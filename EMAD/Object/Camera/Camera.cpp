@@ -51,6 +51,11 @@ void Camera::setAspect(float value) noexcept
 	mAspect = value;
 }
 
+glm::vec3 Camera::getPosition() const noexcept
+{
+	return mPosition;
+}
+
 glm::mat4 Camera::getView() const noexcept
 {
 	return glm::lookAt(mPosition, mPosition + mFront, mFixedWorldUp);

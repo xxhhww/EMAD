@@ -22,12 +22,9 @@ Model::Model(const std::string& path)
     mDir = path.substr(0, path.find_last_of('/'));
     // load all meshs
     for (size_t i = 0; i < scene->mNumMeshes; i++) {
-        aiMaterial* material = scene->mMaterials[scene->mMeshes[i]->mMaterialIndex];
-        aiString diffTexFileName;
-        material->GetTexture(aiTextureType_DIFFUSE, 0, &diffTexFileName);
-
         mMeshPtrs.emplace_back(processMesh(scene->mMeshes[i], scene));
     }
+
     // process node
     mRootNodePtr = std::move(processNode(scene->mRootNode));
 }
@@ -123,6 +120,7 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene) noe
 
     std::shared_ptr<Mesh> rt = std::make_shared<Mesh>(VAO, indices.size());
     // load materials
+    
     if (mesh->mMaterialIndex > 0) {
         // material指向该网格的材质信息
         aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];

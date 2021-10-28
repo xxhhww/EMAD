@@ -78,6 +78,9 @@
     <ClCompile Include="Object\Drawable\Model\Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Object\Drawable\TestPlane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GWin\GWin.h">
@@ -155,6 +158,9 @@
     <ClInclude Include="Object\Drawable\Model\Mesh.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Object\Drawable\TestPlane.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\test_vs.vert" />
@@ -163,5 +169,7 @@
     <None Include="Shader\PointLight_fs.frag" />
     <None Include="Shader\LightShader_vs.vert" />
     <None Include="Shader\LightShader_fs.frag" />
+    <None Include="Shader\normalMap_vs.vert" />
+    <None Include="Shader\normalMap_fs.frag" />
   </ItemGroup>
 </Project>

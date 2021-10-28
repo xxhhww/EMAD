@@ -1,8 +1,11 @@
 #version 330 core
-layout (location = 0) in vec3 position;
-layout (location = 1) in vec2 texcoord;
+layout (location = 0) in vec3 vPosition;
+layout (location = 1) in vec3 vNormal;
+layout (location = 2) in vec2 vTexcoord;
 
-out vec2 Texcoord;
+out vec3 posInView;
+out vec3 normalInView;
+out vec2 texcoord;
 
 uniform mat4 model;
 uniform mat4 view;
@@ -10,6 +13,8 @@ uniform mat4 projection;
 
 void main()
 {
-	gl_Position = projection * view * model * vec4(position, 1.0f);
-	Texcoord = texcoord;
+	gl_Position = projection * view * model * vec4(vPosition, 1.0f);
+	posInView = vec3(view * model * vec4(vPosition, 1.0f));
+	normalInView = vec3(view * model * vec4(vNormal, 0.0f));
+	texcoord = vTexcoord;
 }

@@ -18,7 +18,7 @@ public:
 	}
 
 	void setDiffuseTex(unsigned int tex, const std::string& dir) noexcept { mDiffuseTex = tex; mDiffDir = dir; }
-	void setSpecularTex(unsigned int tex) noexcept { mSpecularTex = tex; mHasSpec = true; }
+	void setSpecularTex(unsigned int tex) noexcept { mSpecularTex = tex; mHasSpec = true;  }
 
 	void draw(std::shared_ptr<Program> program, const glm::mat4& trans) noexcept;
 	virtual glm::mat4 genModelTrans() const noexcept { return mAccumulatedTrans; }

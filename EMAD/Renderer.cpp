@@ -8,6 +8,7 @@
 
 #include "Object/Drawable/TestCube.h"
 #include "Object/Drawable/TestCube2.h"
+#include "Object/Drawable/TestPlane.h"
 #include "Object/Drawable/Model/Model.h"
 
 #include "stb_image.h"
@@ -42,54 +43,15 @@ int App::run()
 {
     std::shared_ptr<Program> PointLightShaderPtr = std::make_shared<Program>("Shader/PointLight_vs.vert", "Shader/PointLight_fs.frag");
     std::shared_ptr<Program> LightShaderPtr = std::make_shared<Program>("Shader/LightShader_vs.vert", "Shader/LightShader_fs.frag");
+    std::shared_ptr<Program> NormalMapShaderPtr = std::make_shared<Program>("Shader/normalMap_vs.vert", "Shader/normalMap_fs.frag");
 
-    std::shared_ptr<Model> testModel = std::make_shared<Model>("Resource/Models/nono/nanosuit.obj");
+    std::shared_ptr<TestPlane> testPlane = std::make_shared<TestPlane>();
+
+    //std::shared_ptr<Model> testModel = std::make_shared<Model>("Resource/Models/nono/nanosuit.obj");
+    //std::shared_ptr<Model> testModel = std::make_shared<Model>("Resource/Models/Sponza/sponza.obj");
 
     float deltaTime = 0.0f; // 当前帧与上一帧的时间差
     float lastFrame = 0.0f; // 上一帧的时间
-
-    /*
-    // 加载材质信息
-    unsigned int texDiffuse, texSepcular;
-    glGenTextures(1, &texDiffuse);
-    glGenTextures(1, &texSepcular);
-    // bind texDiffuse
-    glBindTexture(GL_TEXTURE_2D, texDiffuse);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // 加载图片并生成纹理
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load("Resource/wooden_diffuse.png", &width, &height, &nrChannels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else {
-        THROW_INFO_EXCEPTION("Failed to create texture2D");
-    }
-    stbi_image_free(data);
-    // bind texture 2
-    glBindTexture(GL_TEXTURE_2D, texSepcular);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // 加载图片并生成纹理
-    data = stbi_load("Resource/wooden_specular.png", &width, &height, &nrChannels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else {
-        THROW_INFO_EXCEPTION("Failed to create texture2D");
-    }
-    stbi_image_free(data);
-    */
 
     while (!glfwWindowShouldClose(mWindow.window()))
     {
@@ -104,11 +66,11 @@ int App::run()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         PointLightShaderPtr->activate();
-        PointLightShaderPtr->setBool("isSpec", false);
         PointLightShaderPtr->setMatrix("view", mCamera->getView());
         PointLightShaderPtr->setMatrix("projection", mCamera->getProjection());
         mPointLight->draw(PointLightShaderPtr);
 
+        /*
         LightShaderPtr->activate();
         // view / projection
         LightShaderPtr->setMatrix("view", mCamera->getView());
@@ -136,8 +98,26 @@ int App::run()
         //glBindTexture(GL_TEXTURE_2D, texSepcular);
         // load shaderprogram
         //mTestCube->draw(LightShaderPtr);
+        */
 
-        testModel->draw(LightShaderPtr);
+        NormalMapShaderPtr->activate();
+        // vertex shader constant buffer
+        NormalMapShaderPtr->setMatrix("view", mCamera->getView());
+        NormalMapShaderPtr->setMatrix("projection", mCamera->getProjection());
+        NormalMapShaderPtr->setVec3("PointLightPos", mPointLight->getPosition());
+        NormalMapShaderPtr->setVec3("DirectLightDir", mDirectLight->getDirection());
+        NormalMapShaderPtr->setVec3("viewPos", mCamera->getPosition());
+        // pixel shader constant buffer
+        // point light
+        NormalMapShaderPtr->setVec3("pointLight.diffuse", mPointLight->getColor());
+        NormalMapShaderPtr->setFloat("pointLight.ambient", mPointLight->getAmbient());
+        NormalMapShaderPtr->setFloat("pointLight.specular", mPointLight->getSpecular());
+        // direct light
+        NormalMapShaderPtr->setVec3("directLight.diffuse", mDirectLight->getColor());
+        NormalMapShaderPtr->setFloat("directLight.ambient", mDirectLight->getAmbient());
+        NormalMapShaderPtr->setFloat("directLight.specular", mDirectLight->getSpecular());
+
+        testPlane->draw(NormalMapShaderPtr);
 
         genCtrlGui();
         glfwSwapBuffers(mWindow.window());
@@ -183,7 +163,6 @@ void App::genCtrlGui() const noexcept
     mCamera->genCtrlGui();
     mPointLight->genCtrlGui();
     mDirectLight->genCtrlGui();
-    //mTestCube->genCtrlGui();
 
     static bool isOpen = true;
     if (isOpen) {

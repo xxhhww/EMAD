@@ -13,6 +13,7 @@ public:
 	void rotate(float dx, float dy) noexcept;
 
 	void setAspect(float value) noexcept;
+	glm::vec3 getPosition() const noexcept;
 	glm::mat4 getView() const noexcept;
 	glm::mat4 getProjection() const noexcept;
 
