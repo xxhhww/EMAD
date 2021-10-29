@@ -11,6 +11,7 @@ public:
 	~Program();
 
 	void activate() const noexcept;
+	const unsigned int getProgram() const;
 
 	void setBool(const std::string& name, bool value) const noexcept;
 	void setInt(const std::string& name, int value) const noexcept;

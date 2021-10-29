@@ -62,8 +62,27 @@ int App::run()
     std::shared_ptr<Program> EdgeShaderPtr = std::make_shared<Program>("Shader/Edge_vs.vert", "Shader/Edge_fs.frag");
     std::shared_ptr<Program> SkyBoxShaderPtr = std::make_shared<Program>("Shader/Skybox_vs.vert", "Shader/Skybox_fs.frag");
 
-    std::shared_ptr<TestPlane> testPlane = std::make_shared<TestPlane>();
+    // 将所有着色器的vpTrans(uniform块)设置为绑定点0
+    unsigned int pointLightIndex = glGetUniformBlockIndex(PointLightShaderPtr->getProgram(), "vpTrans");
+    unsigned int normalMapIndex = glGetUniformBlockIndex(NormalMapShaderPtr->getProgram(), "vpTrans");
+    unsigned int edgeIndex = glGetUniformBlockIndex(EdgeShaderPtr->getProgram(), "vpTrans");
+    unsigned int skyboxIndex = glGetUniformBlockIndex(SkyBoxShaderPtr->getProgram(), "vpTrans");
 
+    glUniformBlockBinding(PointLightShaderPtr->getProgram(), pointLightIndex, 0);
+    glUniformBlockBinding(NormalMapShaderPtr->getProgram(), normalMapIndex, 0);
+    glUniformBlockBinding(EdgeShaderPtr->getProgram(), edgeIndex, 0);
+    glUniformBlockBinding(SkyBoxShaderPtr->getProgram(), skyboxIndex, 0);
+    
+    // 创建并分配uniform缓冲对象
+    unsigned int vpTrans;
+    glGenBuffers(1, &vpTrans);
+    glBindBuffer(GL_UNIFORM_BUFFER, vpTrans);
+    glBufferData(GL_UNIFORM_BUFFER, 2 * sizeof(glm::mat4), nullptr, GL_STATIC_DRAW);
+    glBindBuffer(GL_UNIFORM_BUFFER, 0);
+    // 将uniform缓冲对象的特定范围绑定到绑定点0
+    glBindBufferRange(GL_UNIFORM_BUFFER, 0, vpTrans, 0, 2 * sizeof(glm::mat4));
+
+    std::shared_ptr<TestPlane> testPlane = std::make_shared<TestPlane>();
     //std::shared_ptr<Model> testModel = std::make_shared<Model>("Resource/Models/nono/nanosuit.obj");
     //std::shared_ptr<Model> testModel = std::make_shared<Model>("Resource/Models/Sponza/sponza.obj");
 
@@ -82,20 +101,21 @@ int App::run()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+        // 填充uniform缓冲对象(vpTrans)
+        glBindBuffer(GL_UNIFORM_BUFFER, vpTrans);
+        glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mCamera->getView()));
+        glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(mCamera->getProjection()));
+        glBindBuffer(GL_UNIFORM_BUFFER, 0);
+
         SkyBoxShaderPtr->activate();
-        SkyBoxShaderPtr->setMatrix("view", glm::mat4(glm::mat3(mCamera->getView())));
-        SkyBoxShaderPtr->setMatrix("projection", mCamera->getProjection());
+        SkyBoxShaderPtr->setMatrix("realView", glm::mat4(glm::mat3(mCamera->getView())));
         mSkyBox->draw(SkyBoxShaderPtr);
 
         PointLightShaderPtr->activate();
-        PointLightShaderPtr->setMatrix("view", mCamera->getView());
-        PointLightShaderPtr->setMatrix("projection", mCamera->getProjection());
         mPointLight->draw(PointLightShaderPtr);
 
         NormalMapShaderPtr->activate();
         // vertex shader constant buffer
-        NormalMapShaderPtr->setMatrix("view", mCamera->getView());
-        NormalMapShaderPtr->setMatrix("projection", mCamera->getProjection());
         NormalMapShaderPtr->setVec3("PointLightPos", mPointLight->getPosition());
         NormalMapShaderPtr->setVec3("DirectLightDir", mDirectLight->getDirection());
         NormalMapShaderPtr->setVec3("viewPos", mCamera->getPosition());
@@ -111,9 +131,6 @@ int App::run()
 
         EdgeShaderPtr->activate();
         // vertex shader constant buffer
-        EdgeShaderPtr->setMatrix("view", mCamera->getView());
-        EdgeShaderPtr->setMatrix("projection", mCamera->getProjection());
-
 
         // 绘制原物体，将模板缓冲中对应的区域绘制为1
         glStencilFunc(GL_ALWAYS, 1, 0xFF);

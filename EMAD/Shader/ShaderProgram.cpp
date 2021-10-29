@@ -73,6 +73,11 @@ void Program::activate() const noexcept
 	glUseProgram(mProgram);
 }
 
+const unsigned int Program::getProgram() const
+{
+	return mProgram;
+}
+
 void Program::setBool(const std::string& name, bool value) const noexcept
 {
 	glUniform1i(glGetUniformLocation(mProgram, name.c_str()), value);
