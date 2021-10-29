@@ -33,6 +33,8 @@ public:
 		ImGui::End();
 	}
 
+	void setScale(const glm::vec3& scale) noexcept { mScaling = scale; }
+
 	virtual void draw(std::shared_ptr<Program> program) noexcept {
 		program->activate();
 		// 绑定顶点着色器的常量缓存

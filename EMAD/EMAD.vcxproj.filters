@@ -171,5 +171,7 @@
     <None Include="Shader\LightShader_fs.frag" />
     <None Include="Shader\normalMap_vs.vert" />
     <None Include="Shader\normalMap_fs.frag" />
+    <None Include="Shader\Edge_vs.vert" />
+    <None Include="Shader\Edge_fs.frag" />
   </ItemGroup>
 </Project>

@@ -26,8 +26,12 @@
 
 App::App(int width, int height, const std::string& name) noexcept
 	:mWindow(width, height, name){
-    // 启东深度缓冲测试
+    // 启动深度缓冲测试
     glEnable(GL_DEPTH_TEST);
+    // 启动模板测试
+    glEnable(GL_STENCIL_TEST);
+    // 在深度测试与模板测试都通过时，使用ref值(由glStencilFunc函数设置)代替模板缓冲中的值
+    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
 
     mCamera = std::make_shared<Camera>();
     mTestCube = std::make_shared<TestCube2>();
@@ -44,6 +48,7 @@ int App::run()
     std::shared_ptr<Program> PointLightShaderPtr = std::make_shared<Program>("Shader/PointLight_vs.vert", "Shader/PointLight_fs.frag");
     std::shared_ptr<Program> LightShaderPtr = std::make_shared<Program>("Shader/LightShader_vs.vert", "Shader/LightShader_fs.frag");
     std::shared_ptr<Program> NormalMapShaderPtr = std::make_shared<Program>("Shader/normalMap_vs.vert", "Shader/normalMap_fs.frag");
+    std::shared_ptr<Program> EdgeShaderPtr = std::make_shared<Program>("Shader/Edge_vs.vert", "Shader/Edge_fs.frag");
 
     std::shared_ptr<TestPlane> testPlane = std::make_shared<TestPlane>();
 
@@ -63,7 +68,7 @@ int App::run()
         handleInput(deltaTime);
         // clear buffer
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
         PointLightShaderPtr->activate();
         PointLightShaderPtr->setMatrix("view", mCamera->getView());
@@ -117,7 +122,29 @@ int App::run()
         NormalMapShaderPtr->setFloat("directLight.ambient", mDirectLight->getAmbient());
         NormalMapShaderPtr->setFloat("directLight.specular", mDirectLight->getSpecular());
 
+        EdgeShaderPtr->activate();
+        // vertex shader constant buffer
+        EdgeShaderPtr->setMatrix("view", mCamera->getView());
+        EdgeShaderPtr->setMatrix("projection", mCamera->getProjection());
+
+
+        // 绘制原物体，将模板缓冲中对应的区域绘制为1
+        glStencilFunc(GL_ALWAYS, 1, 0xFF);
+        glStencilMask(0xFF);
+        testPlane->setScale(glm::vec3{ 1.0f, 1.0f, 1.0f });
         testPlane->draw(NormalMapShaderPtr);
+        // 绘制放大版的物体，作为原物体的边缘
+        // 如果模板缓冲中的值不等于1，才算通过模板测试，才能有机会绘制在屏幕上
+        glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+        // 关闭模板缓冲的写入
+        glStencilMask(0x00);
+        // 关闭深度测试(防止被其他物体覆盖)
+        glDisable(GL_DEPTH_TEST);
+        testPlane->setScale(glm::vec3{ 1.01f, 1.01f, 1.01f });
+        testPlane->draw(EdgeShaderPtr);
+        // 重新启动深度缓冲与模板缓冲
+        glStencilMask(0xFF);
+        glEnable(GL_DEPTH_TEST);
 
         genCtrlGui();
         glfwSwapBuffers(mWindow.window());
