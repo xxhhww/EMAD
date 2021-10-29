@@ -2,12 +2,6 @@
 #include "../Drawable.hpp"
 #include <string>
 
-class Texture {
-public:
-	static unsigned int Load(const std::string& fileName, const std::string& directory);
-private:
-};
-
 class Mesh : public Drawable{
 public:
 	Mesh(unsigned int VAO, unsigned int indexSize) {

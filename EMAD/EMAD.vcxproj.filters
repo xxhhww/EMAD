@@ -81,6 +81,12 @@
     <ClCompile Include="Object\Drawable\TestPlane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Surface\Surface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Object\Drawable\SkyBox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GWin\GWin.h">
@@ -161,6 +167,12 @@
     <ClInclude Include="Object\Drawable\TestPlane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Surface\Surface.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Object\Drawable\SkyBox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\test_vs.vert" />
@@ -173,5 +185,7 @@
     <None Include="Shader\normalMap_fs.frag" />
     <None Include="Shader\Edge_vs.vert" />
     <None Include="Shader\Edge_fs.frag" />
+    <None Include="Shader\Skybox_vs.vert" />
+    <None Include="Shader\Skybox_fs.frag" />
   </ItemGroup>
 </Project>

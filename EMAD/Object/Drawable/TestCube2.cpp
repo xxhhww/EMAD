@@ -48,7 +48,7 @@ TestCube2::TestCube2()
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
 
-    //创建缓存
+    // 创建缓存
     unsigned int VBO;
     glGenVertexArrays(1, &mVAO);
     glGenBuffers(1, &VBO);

@@ -4,6 +4,7 @@
 
 #include <memory>
 
+class SkyBox;
 class TestCube2;
 class PointLight;
 class DirectLight;
@@ -18,6 +19,7 @@ private:
 	void genCtrlGui() const noexcept;
 private:
 	GWin mWindow;
+	std::shared_ptr<SkyBox> mSkyBox;
 	std::shared_ptr<Camera> mCamera;
 	std::shared_ptr<TestCube2> mTestCube;
 	std::shared_ptr<PointLight> mPointLight;

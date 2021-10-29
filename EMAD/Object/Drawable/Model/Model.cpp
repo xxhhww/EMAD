@@ -3,6 +3,7 @@
 #include "Mesh.h"
 
 #include "../../../Shader/ShaderProgram.h"
+#include "../../../Surface/Surface.h"
 #include "../../../Exception.h"
 
 #include <assimp/Importer.hpp>
@@ -128,11 +129,11 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene) noe
         aiString specTexFileName;
 
         material->GetTexture(aiTextureType_DIFFUSE, 0, &diffTexFileName);
-        rt->setDiffuseTex(Texture::Load(diffTexFileName.C_Str(), mDir), mDir + '/' + diffTexFileName.C_Str());
+        rt->setDiffuseTex(TextureMgr::LoadTexture2D(diffTexFileName.C_Str(), mDir)->getID(), mDir + '/' + diffTexFileName.C_Str());
 
         // ÓÐ¸ß¹âÌùÍ¼
         if (material->GetTexture(aiTextureType_SPECULAR, 0, &specTexFileName) == aiReturn_SUCCESS) {
-            rt->setSpecularTex(Texture::Load(specTexFileName.C_Str(), mDir));
+            rt->setSpecularTex(TextureMgr::LoadTexture2D(specTexFileName.C_Str(), mDir)->getID());
         }
     }
     return rt;

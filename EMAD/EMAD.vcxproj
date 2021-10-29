@@ -170,6 +170,7 @@
     <ClCompile Include="Object\Drawable\Model\Mesh.cpp" />
     <ClCompile Include="Object\Drawable\Model\Model.cpp" />
     <ClCompile Include="Object\Drawable\Model\Node.cpp" />
+    <ClCompile Include="Object\Drawable\SkyBox.cpp" />
     <ClCompile Include="Object\Drawable\TestCube2.cpp" />
     <ClCompile Include="Object\Drawable\TestPlane.cpp" />
     <ClCompile Include="Object\Light\DirectLight.cpp" />
@@ -177,6 +178,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Shader\ShaderProgram.cpp" />
     <ClCompile Include="stb_image.cpp" />
+    <ClCompile Include="Surface\Surface.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EMath.h" />
@@ -196,6 +198,7 @@
     <ClInclude Include="Object\Drawable\Model\Mesh.h" />
     <ClInclude Include="Object\Drawable\Model\Model.h" />
     <ClInclude Include="Object\Drawable\Model\Node.h" />
+    <ClInclude Include="Object\Drawable\SkyBox.h" />
     <ClInclude Include="Object\Drawable\TestCube2.h" />
     <ClInclude Include="Object\Drawable\TestPlane.h" />
     <ClInclude Include="Object\EObject.h" />
@@ -205,6 +208,7 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Shader\ShaderProgram.h" />
     <ClInclude Include="stb_image.h" />
+    <ClInclude Include="Surface\Surface.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\Edge_fs.frag" />
@@ -215,6 +219,8 @@
     <None Include="Shader\normalMap_vs.vert" />
     <None Include="Shader\PointLight_fs.frag" />
     <None Include="Shader\PointLight_vs.vert" />
+    <None Include="Shader\Skybox_fs.frag" />
+    <None Include="Shader\Skybox_vs.vert" />
     <None Include="Shader\test_fs.frag" />
     <None Include="Shader\test_vs.vert" />
   </ItemGroup>

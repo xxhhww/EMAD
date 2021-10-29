@@ -9,6 +9,7 @@
 #include "Object/Drawable/TestCube.h"
 #include "Object/Drawable/TestCube2.h"
 #include "Object/Drawable/TestPlane.h"
+#include "Object/Drawable/SkyBox.h"
 #include "Object/Drawable/Model/Model.h"
 
 #include "stb_image.h"
@@ -37,6 +38,17 @@ App::App(int width, int height, const std::string& name) noexcept
     mTestCube = std::make_shared<TestCube2>();
     mPointLight = std::make_shared<PointLight>();
     mDirectLight = std::make_shared<DirectLight>();
+
+    std::vector<std::string> fileNames{
+        "right.jpg",
+        "left.jpg",
+        "top.jpg",
+        "bottom.jpg",
+        "front.jpg",
+        "back.jpg"
+    };
+
+    mSkyBox = std::make_shared<SkyBox>("Resource/SkyBox", fileNames);
 }
 
 App::~App()
@@ -46,9 +58,9 @@ App::~App()
 int App::run()
 {
     std::shared_ptr<Program> PointLightShaderPtr = std::make_shared<Program>("Shader/PointLight_vs.vert", "Shader/PointLight_fs.frag");
-    std::shared_ptr<Program> LightShaderPtr = std::make_shared<Program>("Shader/LightShader_vs.vert", "Shader/LightShader_fs.frag");
     std::shared_ptr<Program> NormalMapShaderPtr = std::make_shared<Program>("Shader/normalMap_vs.vert", "Shader/normalMap_fs.frag");
     std::shared_ptr<Program> EdgeShaderPtr = std::make_shared<Program>("Shader/Edge_vs.vert", "Shader/Edge_fs.frag");
+    std::shared_ptr<Program> SkyBoxShaderPtr = std::make_shared<Program>("Shader/Skybox_vs.vert", "Shader/Skybox_fs.frag");
 
     std::shared_ptr<TestPlane> testPlane = std::make_shared<TestPlane>();
 
@@ -70,40 +82,15 @@ int App::run()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
+        SkyBoxShaderPtr->activate();
+        SkyBoxShaderPtr->setMatrix("view", glm::mat4(glm::mat3(mCamera->getView())));
+        SkyBoxShaderPtr->setMatrix("projection", mCamera->getProjection());
+        mSkyBox->draw(SkyBoxShaderPtr);
+
         PointLightShaderPtr->activate();
         PointLightShaderPtr->setMatrix("view", mCamera->getView());
         PointLightShaderPtr->setMatrix("projection", mCamera->getProjection());
         mPointLight->draw(PointLightShaderPtr);
-
-        /*
-        LightShaderPtr->activate();
-        // view / projection
-        LightShaderPtr->setMatrix("view", mCamera->getView());
-        LightShaderPtr->setMatrix("projection", mCamera->getProjection());
-        // point light
-        LightShaderPtr->setVec3("pointLight.posInView", glm::vec3{ mCamera->getView() * glm::vec4{ mPointLight->getPosition(), 1.0f } });
-        LightShaderPtr->setVec3("pointLight.diffuse", mPointLight->getColor());
-        LightShaderPtr->setFloat("pointLight.ambient", mPointLight->getAmbient());
-        LightShaderPtr->setFloat("pointLight.specular", mPointLight->getSpecular());
-        // direct light
-        LightShaderPtr->setVec3("directLight.direction", glm::vec3{ mCamera->getView() * glm::vec4{ mDirectLight->getDirection(), 0.0f } });
-        LightShaderPtr->setVec3("directLight.diffuse", mDirectLight->getColor());
-        LightShaderPtr->setFloat("directLight.ambient", mDirectLight->getAmbient());
-        LightShaderPtr->setFloat("directLight.specular", mDirectLight->getSpecular());
-        // material
-        LightShaderPtr->setFloat("material.shininess", 32.0f);
-        //LightShaderPtr->setBool("hasSpec", true);
-        // 设置采样器对应的纹理单元
-        LightShaderPtr->setInt("material.diffuse", 0);
-        LightShaderPtr->setInt("material.specular", 1);
-
-        //glActiveTexture(GL_TEXTURE0);
-        //glBindTexture(GL_TEXTURE_2D, texDiffuse);
-        //glActiveTexture(GL_TEXTURE1);
-        //glBindTexture(GL_TEXTURE_2D, texSepcular);
-        // load shaderprogram
-        //mTestCube->draw(LightShaderPtr);
-        */
 
         NormalMapShaderPtr->activate();
         // vertex shader constant buffer
