@@ -2,12 +2,11 @@
 
 #include "../EMath.h"
 #include <string>
-#include <fstream>
 
 //着色器程序类
 class Program {
 public:
-	Program(const std::string& vShader, const std::string& fShader);
+	Program(const std::string& vShader, const std::string& fShader, const std::string& gShader = "");
 	~Program();
 
 	void activate() const noexcept;

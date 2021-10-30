@@ -1,6 +1,6 @@
 #include "Renderer.h"
 
-#include "Shader/ShaderProgram.h"
+#include "Program/Program.h"
 
 #include "Object/Camera/Camera.h"
 #include "Object/Light/PointLight.h"
@@ -60,17 +60,21 @@ int App::run()
     std::shared_ptr<Program> PointLightShaderPtr = std::make_shared<Program>("Shader/PointLight_vs.vert", "Shader/PointLight_fs.frag");
     std::shared_ptr<Program> NormalMapShaderPtr = std::make_shared<Program>("Shader/normalMap_vs.vert", "Shader/normalMap_fs.frag");
     std::shared_ptr<Program> EdgeShaderPtr = std::make_shared<Program>("Shader/Edge_vs.vert", "Shader/Edge_fs.frag");
+    std::shared_ptr<Program> NormalVisualShaderPtr =
+        std::make_shared<Program>("Shader/NormalVisual_vs.vert", "Shader/NormalVisual_fs.frag", "Shader/NormalVisual_gs.geom");
     std::shared_ptr<Program> SkyBoxShaderPtr = std::make_shared<Program>("Shader/Skybox_vs.vert", "Shader/Skybox_fs.frag");
 
     // 将所有着色器的vpTrans(uniform块)设置为绑定点0
     unsigned int pointLightIndex = glGetUniformBlockIndex(PointLightShaderPtr->getProgram(), "vpTrans");
     unsigned int normalMapIndex = glGetUniformBlockIndex(NormalMapShaderPtr->getProgram(), "vpTrans");
     unsigned int edgeIndex = glGetUniformBlockIndex(EdgeShaderPtr->getProgram(), "vpTrans");
+    unsigned int normalVisualIndex = glGetUniformBlockIndex(NormalVisualShaderPtr->getProgram(), "vpTrans");
     unsigned int skyboxIndex = glGetUniformBlockIndex(SkyBoxShaderPtr->getProgram(), "vpTrans");
 
     glUniformBlockBinding(PointLightShaderPtr->getProgram(), pointLightIndex, 0);
     glUniformBlockBinding(NormalMapShaderPtr->getProgram(), normalMapIndex, 0);
     glUniformBlockBinding(EdgeShaderPtr->getProgram(), edgeIndex, 0);
+    glUniformBlockBinding(NormalVisualShaderPtr->getProgram(), normalVisualIndex, 0);
     glUniformBlockBinding(SkyBoxShaderPtr->getProgram(), skyboxIndex, 0);
     
     // 创建并分配uniform缓冲对象
@@ -130,7 +134,6 @@ int App::run()
         NormalMapShaderPtr->setFloat("directLight.specular", mDirectLight->getSpecular());
 
         EdgeShaderPtr->activate();
-        // vertex shader constant buffer
 
         // 绘制原物体，将模板缓冲中对应的区域绘制为1
         glStencilFunc(GL_ALWAYS, 1, 0xFF);
@@ -149,6 +152,9 @@ int App::run()
         // 重新启动深度缓冲与模板缓冲
         glStencilMask(0xFF);
         glEnable(GL_DEPTH_TEST);
+
+        testPlane->setScale(glm::vec3{ 1.0f, 1.0f, 1.0f });
+        testPlane->draw(NormalVisualShaderPtr);
 
         genCtrlGui();
         glfwSwapBuffers(mWindow.window());

@@ -1,5 +1,5 @@
 #include "TestCube2.h"
-#include "../../Shader/ShaderProgram.h"
+#include "../../Program/Program.h"
 
 TestCube2::TestCube2()
 {

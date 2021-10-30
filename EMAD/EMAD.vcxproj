@@ -175,8 +175,9 @@
     <ClCompile Include="Object\Drawable\TestPlane.cpp" />
     <ClCompile Include="Object\Light\DirectLight.cpp" />
     <ClCompile Include="Object\Light\PointLight.cpp" />
+    <ClCompile Include="Program\Program.cpp" />
+    <ClCompile Include="Program\Shader.cpp" />
     <ClCompile Include="Renderer.cpp" />
-    <ClCompile Include="Shader\ShaderProgram.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Surface\Surface.cpp" />
   </ItemGroup>
@@ -205,8 +206,9 @@
     <ClInclude Include="Object\Geometry\Sphere.h" />
     <ClInclude Include="Object\Light\DirectLight.h" />
     <ClInclude Include="Object\Light\PointLight.h" />
+    <ClInclude Include="Program\Program.h" />
+    <ClInclude Include="Program\Shader.h" />
     <ClInclude Include="Renderer.h" />
-    <ClInclude Include="Shader\ShaderProgram.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Surface\Surface.h" />
   </ItemGroup>
@@ -217,6 +219,9 @@
     <None Include="Shader\LightShader_vs.vert" />
     <None Include="Shader\normalMap_fs.frag" />
     <None Include="Shader\normalMap_vs.vert" />
+    <None Include="Shader\NormalVisual_fs.frag" />
+    <None Include="Shader\NormalVisual_gs.geom" />
+    <None Include="Shader\NormalVisual_vs.vert" />
     <None Include="Shader\PointLight_fs.frag" />
     <None Include="Shader\PointLight_vs.vert" />
     <None Include="Shader\Skybox_fs.frag" />

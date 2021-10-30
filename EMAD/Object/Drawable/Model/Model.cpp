@@ -2,7 +2,7 @@
 #include "Node.h"
 #include "Mesh.h"
 
-#include "../../../Shader/ShaderProgram.h"
+#include "../../../Program/Program.h"
 #include "../../../Surface/Surface.h"
 #include "../../../Exception.h"
 

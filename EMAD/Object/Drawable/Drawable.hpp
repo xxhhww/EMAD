@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../EObject.h"
-#include "../../Shader/ShaderProgram.h"
+#include "../../Program/Program.h"
 
 #include <memory>
 

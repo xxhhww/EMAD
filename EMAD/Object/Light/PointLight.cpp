@@ -1,5 +1,5 @@
 #include "PointLight.h"
-#include "../../Shader/ShaderProgram.h"
+#include "../../Program/Program.h"
 #include "../Geometry/Sphere.h"
 
 PointLight::PointLight()
