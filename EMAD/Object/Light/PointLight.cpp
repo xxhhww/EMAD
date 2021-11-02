@@ -2,7 +2,8 @@
 #include "../../Program/Program.h"
 #include "../Geometry/Sphere.h"
 
-PointLight::PointLight()
+PointLight::PointLight(const std::string& name)
+	:Drawable(name)
 {
 	mPosition = { 0.0f, 0.0f, -1.0f };
 	mScaling = { 0.1f, 0.1f, 0.1f };
@@ -37,7 +38,7 @@ PointLight::PointLight()
 
 void PointLight::genCtrlGui() noexcept
 {
-	if (ImGui::Begin("PointLight")) {
+	if (ImGui::Begin(mName.c_str())) {
 		ImGui::Text("Position");
 		ImGui::SliderFloat("Pos-X", &mPosition.x, -10.0f, 10.0f, "%.1f");
 		ImGui::SliderFloat("Pos-Y", &mPosition.y, -10.0f, 10.0f, "%.1f");

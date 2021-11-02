@@ -18,5 +18,5 @@ out VS_OUT{
 void main(){
 	gl_Position = projection * view * model * vec4(position ,1.0f);
 	// 几何着色器在裁剪空间中进行计算，因此，法向量必须转换到裁剪空间中
-    vs_out.normal = vec3(projection * view * vec4(normal, 0.0f));
+    vs_out.normal = vec3(projection * view * model * vec4(normal, 0.0f));
 }

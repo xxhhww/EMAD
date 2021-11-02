@@ -54,6 +54,9 @@ std::unique_ptr<Node> Model::processNode(aiNode* node) noexcept
 
 std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene) noexcept
 {
+    static unsigned int id = 0;
+    id++;
+
     struct Vertex {
         glm::vec3 Position;
         glm::vec3 Normal;
@@ -119,7 +122,7 @@ std::shared_ptr<Mesh> Model::processMesh(aiMesh* mesh, const aiScene* scene) noe
 
     glBindVertexArray(0);
 
-    std::shared_ptr<Mesh> rt = std::make_shared<Mesh>(VAO, indices.size());
+    std::shared_ptr<Mesh> rt = std::make_shared<Mesh>(std::to_string(id), VAO, indices.size());
     // load materials
     
     if (mesh->mMaterialIndex > 0) {

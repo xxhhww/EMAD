@@ -4,7 +4,7 @@
 class Program;
 class PointLight : public Drawable{
 public:
-	PointLight();
+	PointLight(const std::string& name);
 
 	virtual void genCtrlGui() noexcept override;
 	virtual void draw(std::shared_ptr<Program> program) noexcept override;

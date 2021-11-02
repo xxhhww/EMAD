@@ -4,7 +4,9 @@
 
 class Mesh : public Drawable{
 public:
-	Mesh(unsigned int VAO, unsigned int indexSize) {
+	Mesh(const std::string& name, unsigned int VAO, unsigned int indexSize) 
+		:Drawable(name)
+	{
 		mVAO = VAO;
 		mIndexSize = indexSize;
 		mAccumulatedTrans = glm::mat4{ 1.0f };

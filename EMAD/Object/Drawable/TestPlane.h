@@ -3,7 +3,7 @@
 
 class TestPlane : public Drawable {
 public:
-	TestPlane();
+	TestPlane(const std::string& name);
 
 	virtual void draw(std::shared_ptr<Program> program) noexcept override;
 private:

@@ -8,13 +8,16 @@
 class Program;
 class Drawable : public EObject {
 public:
+	Drawable(const std::string& name) noexcept
+	:mName(name) {}
+
 	virtual ~Drawable() {
 		glDeleteVertexArrays(1, &mVAO);
 	}
 
 	// 生成控制窗口
 	virtual void genCtrlGui() noexcept override {
-		if (ImGui::Begin("Cube")) {
+		if (ImGui::Begin(mName.c_str())) {
 			ImGui::Text("Position");
 			ImGui::SliderFloat("Pos-X", &mPosition.x, -10.0f, 10.0f, "%.1f");
 			ImGui::SliderFloat("Pos-Y", &mPosition.y, -10.0f, 10.0f, "%.1f");
@@ -33,7 +36,13 @@ public:
 		ImGui::End();
 	}
 
+	void setPosition(const glm::vec3& pos) noexcept { mPosition = pos; }
 	void setScale(const glm::vec3& scale) noexcept { mScaling = scale; }
+	void setRotation(const glm::vec3& rotate) noexcept {
+		mPitch = rotate.x;
+		mYaw = rotate.y;
+		mRoll = rotate.z;
+	}
 
 	virtual void draw(std::shared_ptr<Program> program) noexcept {
 		program->activate();
@@ -61,9 +70,10 @@ protected:
 	}
 protected:
 	// 顶点属性信息
-	unsigned int mVAO;
-	unsigned int mIndexSize;
+	unsigned int mVAO = 0;
+	unsigned int mIndexSize = 0;
 
+	std::string mName;
 	// 控制信息
 	glm::vec3 mPosition{ 0.0f, 0.0f, 0.0f }; // 位置数据
 	glm::vec3 mScaling{ 1.0f, 1.0f, 1.0f };  // 缩放比例

@@ -23,7 +23,7 @@ private:
 
 class TextureMgr {
 public:
-	static Texture::ptr LoadTexture2D(const std::string& dir, const std::string& fileName);
+	static Texture::ptr LoadTexture2D(const std::string& dir, const std::string& fileName, bool isFlip = false);
 	static Texture::ptr LoadCubeMap(const std::string& dir, std::vector<std::string>& fileNames);
 private:
 	// 检查程序中是否已经加载该Texture

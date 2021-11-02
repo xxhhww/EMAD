@@ -196,5 +196,7 @@
     <None Include="Shader\NormalVisual_vs.vert" />
     <None Include="Shader\NormalVisual_fs.frag" />
     <None Include="Shader\NormalVisual_gs.geom" />
+    <None Include="Shader\ShadowMapCube_fs.frag" />
+    <None Include="Shader\ShadowMapCube_vs.vert" />
   </ItemGroup>
 </Project>

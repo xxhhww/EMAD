@@ -2,7 +2,7 @@
 #include "../Exception.h"
 #include <glad/glad.h>
 
-Texture::ptr TextureMgr::LoadTexture2D(const std::string& dir, const std::string& fileName)
+Texture::ptr TextureMgr::LoadTexture2D(const std::string& dir, const std::string& fileName, bool isFlip)
 {
     std::string tag = dir + '/' + fileName;
     // 已经加载过该纹理，直接读取
@@ -14,6 +14,7 @@ Texture::ptr TextureMgr::LoadTexture2D(const std::string& dir, const std::string
     glGenTextures(1, &textureID);
 
     int width, height, nrComponents;
+    stbi_set_flip_vertically_on_load(isFlip);
     unsigned char* data = stbi_load(tag.c_str(), &width, &height, &nrComponents, 0);
     if (data) {
         GLenum format;

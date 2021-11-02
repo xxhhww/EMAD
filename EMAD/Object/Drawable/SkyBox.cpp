@@ -1,7 +1,8 @@
 #include "SkyBox.h"
 #include "../../Surface/Surface.h"
 
-SkyBox::SkyBox(const std::string& dir, std::vector<std::string>& fileNames)
+SkyBox::SkyBox(const std::string& name, const std::string& dir, std::vector<std::string>& fileNames)
+    :Drawable(name)
 {
     // load material
     mCubeMapPtr = TextureMgr::LoadCubeMap(dir, fileNames);

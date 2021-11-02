@@ -1,8 +1,8 @@
 #include "TestPlane.h"
-#include "../../Exception.h"
-#include "../../stb_image.h"
+#include "../../Surface/Surface.h"
 
-TestPlane::TestPlane()
+TestPlane::TestPlane(const std::string& name)
+    :Drawable(name)
 {
     // positions
     glm::vec3 pos1(-1.0, 1.0, 0.0);
@@ -93,45 +93,8 @@ TestPlane::TestPlane()
     glBindVertexArray(0);
 
     // load and create texture(s)
-    glGenTextures(1, &mDiffuseMap);
-    glGenTextures(1, &mNormalMap);
-
-    // bind diffuse texture 
-    glBindTexture(GL_TEXTURE_2D, mDiffuseMap);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // 加载图片并生成纹理
-    int width, height, nrChannels;
-    stbi_set_flip_vertically_on_load(true);
-    unsigned char* data = stbi_load("Resource/brickwall.jpg", &width, &height, &nrChannels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else {
-        THROW_INFO_EXCEPTION("Failed to create texture2D");
-    }
-    stbi_image_free(data);
-    // bind texture 2
-    glBindTexture(GL_TEXTURE_2D, mNormalMap);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // 加载图片并生成纹理
-    data = stbi_load("Resource/brickwall_normal.jpg", &width, &height, &nrChannels, 0);
-    if (data) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else {
-        THROW_INFO_EXCEPTION("Failed to create texture2D");
-    }
-    stbi_image_free(data);
+    mDiffuseMap = TextureMgr::LoadTexture2D("Resource", "brickwall.jpg", true)->getID();
+    mNormalMap = TextureMgr::LoadTexture2D("Resource", "brickwall_normal.jpg", true)->getID();   
 }
 
 void TestPlane::draw(std::shared_ptr<Program> program) noexcept
