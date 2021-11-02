@@ -4,7 +4,7 @@
 
 PointLight::PointLight()
 {
-	mPosition = { 2.0f, 2.0f, -2.0f };
+	mPosition = { 0.0f, 0.0f, -1.0f };
 	mScaling = { 0.1f, 0.1f, 0.1f };
 
 	// vertices
