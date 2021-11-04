@@ -81,6 +81,7 @@ int App::run()
     std::shared_ptr<Program> SkyBoxShaderPtr = std::make_shared<Program>("Shader/Skybox_vs.vert", "Shader/Skybox_fs.frag");
 
     std::shared_ptr<Program> GenDLDepthMapPtr = std::make_shared<Program>("Shader/GenDLDepthMap_vs.vert", "Shader/GenDLDepthMap_fs.frag");
+    std::shared_ptr<Program> GenPLDepthMapPtr = std::make_shared<Program>("Shader/GenPLDepthMap_vs.vert", "Shader/GenPLDepthMap_fs.frag", "Shader/GenPLDepthMap_gs.geom");
     std::shared_ptr<Program> DebugQuadMapPtr = std::make_shared<Program>("Shader/DebugQuadMap_vs.vert", "Shader/DebugQuadMap_fs.frag");
     std::shared_ptr<Program> CubeShadowShaderPtr = std::make_shared<Program>("Shader/ShadowMapCube_vs.vert", "Shader/ShadowMapCube_fs.frag");
 
@@ -119,24 +120,32 @@ int App::run()
     glGenFramebuffers(1, &depthMapFBO);
 
     // 创建2D纹理，用于存储深度缓冲的信息
+    unsigned int SHADOW_WIDTH = 1024;
+    unsigned int SHADOW_HEIGHT = 1024;
     GLuint depthMap;
     glGenTextures(1, &depthMap);
     // 填充2D纹理对象信息
     glBindTexture(GL_TEXTURE_2D, depthMap);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
     GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
     glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
-    // 将2D纹理以深度缓冲附件的形式绑定到帧缓冲中
-    glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
-    // 由于没有颜色缓冲附件的帧缓冲是不完整的，因此，我们需要告诉GL我们不使用任何颜色数据
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    // 创建立方体贴图，用来存储点光源的深度缓冲信息
+    GLuint cubeDepthMap;
+    glGenTextures(1, &cubeDepthMap);
+    // 填充立方体贴图的属性
+    glBindTexture(GL_TEXTURE_CUBE_MAP, cubeDepthMap);
+    for (GLuint i = 0; i < 6; ++i)
+        glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_DEPTH_COMPONENT, SHADOW_WIDTH, SHADOW_HEIGHT, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
 
     float deltaTime = 0.0f; // 当前帧与上一帧的时间差
     float lastFrame = 0.0f; // 上一帧的时间
@@ -158,16 +167,15 @@ int App::run()
         glBufferSubData(GL_UNIFORM_BUFFER, 0, sizeof(glm::mat4), glm::value_ptr(mCamera->getView()));
         glBufferSubData(GL_UNIFORM_BUFFER, sizeof(glm::mat4), sizeof(glm::mat4), glm::value_ptr(mCamera->getProjection()));
         glBindBuffer(GL_UNIFORM_BUFFER, 0);
-
-        SkyBoxShaderPtr->activate();
-        SkyBoxShaderPtr->setMatrix("realView", glm::mat4(glm::mat3(mCamera->getView())));
-        mSkyBox->draw(SkyBoxShaderPtr);
-
         
         // 第一步，获得从定向光角度看的深度缓冲
         // 此深度缓冲作为第二次渲染时的阴影映射
-        glViewport(0, 0, 1024, 1024);
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
         glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
+        // 由于没有颜色缓冲附件的帧缓冲是不完整的，因此，我们需要告诉GL我们不使用任何颜色数据
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
         glClear(GL_DEPTH_BUFFER_BIT);
         
         // 定向光使用正交投影
@@ -184,9 +192,54 @@ int App::run()
         mTestPlane1->draw(GenDLDepthMapPtr);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-        // 第二步，正常绘制
-        glViewport(0, 0, (float)mWindow.getRectangle().first, (float)mWindow.getRectangle().second);
+        // 第二步，获得从定向光角度看的深度缓冲
+        glViewport(0, 0, SHADOW_WIDTH, SHADOW_HEIGHT);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, cubeDepthMap, 0);
+        // 由于没有颜色缓冲附件的帧缓冲是不完整的，因此，我们需要告诉GL我们不使用任何颜色数据
+        glDrawBuffer(GL_NONE);
+        glReadBuffer(GL_NONE);
+        glClear(GL_DEPTH_BUFFER_BIT);
 
+        // 点光源使用正交投影
+        GLfloat plAspect = (GLfloat)SHADOW_WIDTH / (GLfloat)SHADOW_HEIGHT;
+        GLfloat near = 1.0f;
+        GLfloat far = 25.0f;
+        glm::mat4 plProjection = glm::perspective(glm::radians(90.0f), plAspect, near, far);
+        // 因为要填充六个面，所以需要六个ViewTrans
+        std::vector<glm::mat4> plSpaceMats;
+        plSpaceMats.push_back(plProjection *
+            glm::lookAt(mPointLight->getPosition(), mPointLight->getPosition() + glm::vec3(1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+        plSpaceMats.push_back(plProjection *
+            glm::lookAt(mPointLight->getPosition(), mPointLight->getPosition() + glm::vec3(-1.0, 0.0, 0.0), glm::vec3(0.0, -1.0, 0.0)));
+        plSpaceMats.push_back(plProjection *
+            glm::lookAt(mPointLight->getPosition(), mPointLight->getPosition() + glm::vec3(0.0, 1.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));
+        plSpaceMats.push_back(plProjection *
+            glm::lookAt(mPointLight->getPosition(), mPointLight->getPosition() + glm::vec3(0.0, -1.0, 0.0), glm::vec3(0.0, 0.0, -1.0)));
+        plSpaceMats.push_back(plProjection *
+            glm::lookAt(mPointLight->getPosition(), mPointLight->getPosition() + glm::vec3(0.0, 0.0, 1.0), glm::vec3(0.0, -1.0, 0.0)));
+        plSpaceMats.push_back(plProjection *
+            glm::lookAt(mPointLight->getPosition(), mPointLight->getPosition() + glm::vec3(0.0, 0.0, -1.0), glm::vec3(0.0, -1.0, 0.0)));
+
+        GenPLDepthMapPtr->activate();
+        /*
+        for (GLuint i = 0; i < 6; ++i)
+            glUniformMatrix4fv(glGetUniformLocation(simpleDepthShader.Program, 
+                ("shadowMatrices[" + std::to_string(i) + "]").c_str()), 1, GL_FALSE, 
+                glm::value_ptr(shadowTransforms[i]));
+        */
+        for (GLuint i = 0; i < 6; i++)
+            GenPLDepthMapPtr->setMatrix(("plSpaceMats[" + std::to_string(i) + "]"), plSpaceMats[i]);
+        GenPLDepthMapPtr->setVec3("plLightPos", mPointLight->getPosition());
+        GenPLDepthMapPtr->setFloat("far_plane", far);
+        mTestCube1->draw(GenPLDepthMapPtr);
+        mTestCube2->draw(GenPLDepthMapPtr);
+        mTestCube3->draw(GenPLDepthMapPtr);
+        mTestPlane1->draw(GenPLDepthMapPtr);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // 第三步，正常绘制
+        glViewport(0, 0, (float)mWindow.getRectangle().first, (float)mWindow.getRectangle().second);
         //debug
         /*
         DebugQuadMapPtr->activate();
@@ -195,32 +248,13 @@ int App::run()
         testQuad->setTexture(depthMap);
         testQuad->draw(DebugQuadMapPtr);
         */
+        SkyBoxShaderPtr->activate();
+        SkyBoxShaderPtr->setMatrix("realView", glm::mat4(glm::mat3(mCamera->getView())));
+        mSkyBox->draw(SkyBoxShaderPtr);
+
         PointLightShaderPtr->activate();
         mPointLight->setScale(glm::vec3{ 0.1f, 0.1f, 0.1f });
         mPointLight->draw(PointLightShaderPtr);
-        
-        NormalMapShaderPtr->activate();
-        // bind shadowMap
-        NormalMapShaderPtr->setInt("dlShadowMap", 2);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, depthMap);
-        // dlLightSpaceMatrix
-        NormalMapShaderPtr->setMatrix("dlSpaceMat", dlSpaceMat);
-        // vertex shader constant buffer
-        NormalMapShaderPtr->setVec3("PointLightPos", mPointLight->getPosition());
-        NormalMapShaderPtr->setVec3("DirectLightDir", mDirectLight->getDirection());
-        NormalMapShaderPtr->setVec3("viewPos", mCamera->getPosition());
-        // pixel shader constant buffer
-        // point light
-        NormalMapShaderPtr->setVec3("pointLight.diffuse", mPointLight->getColor());
-        NormalMapShaderPtr->setFloat("pointLight.ambient", mPointLight->getAmbient());
-        NormalMapShaderPtr->setFloat("pointLight.specular", mPointLight->getSpecular());
-        // direct light
-        NormalMapShaderPtr->setVec3("directLight.diffuse", mDirectLight->getColor());
-        NormalMapShaderPtr->setFloat("directLight.ambient", mDirectLight->getAmbient());
-        NormalMapShaderPtr->setFloat("directLight.specular", mDirectLight->getSpecular());
-
-        mTestPlane1->draw(NormalMapShaderPtr);
        
         CubeShadowShaderPtr->activate();
         // bind shadowMap
@@ -243,6 +277,35 @@ int App::run()
         mTestCube1->draw(CubeShadowShaderPtr);
         mTestCube2->draw(CubeShadowShaderPtr);
         mTestCube3->draw(CubeShadowShaderPtr);
+
+        NormalMapShaderPtr->activate();
+        // bind shadowMap
+        NormalMapShaderPtr->setInt("dlShadowMap", 2);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        // dlLightSpaceMatrix
+        NormalMapShaderPtr->setMatrix("dlSpaceMat", dlSpaceMat);
+        // bind PL ShadowMap
+        NormalMapShaderPtr->setInt("plShadowMap", 3);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubeDepthMap);
+        // bind far plane
+        NormalMapShaderPtr->setFloat("far_plane", far);
+        // vertex shader constant buffer
+        NormalMapShaderPtr->setVec3("PointLightPos", mPointLight->getPosition());
+        NormalMapShaderPtr->setVec3("DirectLightDir", mDirectLight->getDirection());
+        NormalMapShaderPtr->setVec3("viewPos", mCamera->getPosition());
+        // pixel shader constant buffer
+        // point light
+        NormalMapShaderPtr->setVec3("pointLight.diffuse", mPointLight->getColor());
+        NormalMapShaderPtr->setFloat("pointLight.ambient", mPointLight->getAmbient());
+        NormalMapShaderPtr->setFloat("pointLight.specular", mPointLight->getSpecular());
+        // direct light
+        NormalMapShaderPtr->setVec3("directLight.diffuse", mDirectLight->getColor());
+        NormalMapShaderPtr->setFloat("directLight.ambient", mDirectLight->getAmbient());
+        NormalMapShaderPtr->setFloat("directLight.specular", mDirectLight->getSpecular());
+
+        mTestPlane1->draw(NormalMapShaderPtr);
 
         genCtrlGui();
 
@@ -291,6 +354,9 @@ void App::genCtrlGui() const noexcept
     mPointLight->genCtrlGui();
     mDirectLight->genCtrlGui();
     mTestPlane1->genCtrlGui();
+    mTestCube1->genCtrlGui();
+    mTestCube2->genCtrlGui();
+    mTestCube3->genCtrlGui();
 
     static bool isOpen = false;
     if (isOpen) {

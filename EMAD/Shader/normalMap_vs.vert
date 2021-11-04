@@ -11,6 +11,7 @@ layout (std140) uniform vpTrans{
 
 out VS_OUT {
     vec3 FragPos;
+    vec3 plLightPos; //世界坐标下的点光源位置
     vec4 PosInDLSpace; //在定向光的投影空间中的顶点坐标
     vec2 TexCoords;
     vec3 TangentFragPos;
@@ -32,6 +33,7 @@ void main()
 {
     gl_Position = projection * view * model * vec4(position, 1.0f);
     vs_out.FragPos = vec3(model * vec4(position, 1.0f));
+    vs_out.plLightPos = PointLightPos;
     vs_out.PosInDLSpace = dlSpaceMat * model * vec4(position, 1.0f);
     vs_out.TexCoords = texCoords;
     

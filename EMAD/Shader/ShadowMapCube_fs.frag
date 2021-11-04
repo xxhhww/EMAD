@@ -57,7 +57,8 @@ float calcShadow(vec3 normal, vec3 lightDir){
     // 当前像素点在定向光的投影空间下的深度
     float currentDepth = projCoords.z;
     // 偏移量
-    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    //float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float bias = 0.005;
     float shadow = 0.0;
     vec2 texelSize = 1.0 / textureSize(dlShadowMap, 0);
     for(int x = -1; x <= 1; ++x)
@@ -124,5 +125,5 @@ vec3 calcDirecLight(DirectLight light, vec3 pos, vec3 normal){
     float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
     specularColor = specularFactor * light.specular * texture(material.specular, texcoord).rgb;
 
-    return ambientColor + (1 - calcShadow(normal, lightDir))* (diffuseColor + specularColor);
+    return ambientColor +  (1 - calcShadow(normal, lightDir))* (diffuseColor + specularColor);
 }

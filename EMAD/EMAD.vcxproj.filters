@@ -208,5 +208,8 @@
     <None Include="Shader\GenDLDepthMap_fs.frag" />
     <None Include="Shader\DebugQuadMap_vs.vert" />
     <None Include="Shader\DebugQuadMap_fs.frag" />
+    <None Include="Shader\GenPLDepthMap_vs.vert" />
+    <None Include="Shader\GenPLDepthMap_fs.frag" />
+    <None Include="Shader\GenPLDepthMap_gs.geom" />
   </ItemGroup>
 </Project>

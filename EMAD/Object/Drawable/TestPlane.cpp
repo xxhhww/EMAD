@@ -10,10 +10,10 @@ TestPlane::TestPlane(const std::string& name)
     glm::vec3 pos3(1.0, -1.0, 0.0);
     glm::vec3 pos4(1.0, 1.0, 0.0);
     // texture coordinates
-    glm::vec2 uv1(0.0, 1.0);
+    glm::vec2 uv1(0.0, 10.0);
     glm::vec2 uv2(0.0, 0.0);
-    glm::vec2 uv3(1.0, 0.0);
-    glm::vec2 uv4(1.0, 1.0);
+    glm::vec2 uv3(10.0, 0.0);
+    glm::vec2 uv4(10.0, 10.0);
     // normal vector
     glm::vec3 nm(0.0, 0.0, 1.0);
 

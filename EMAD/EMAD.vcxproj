@@ -221,6 +221,9 @@
     <None Include="Shader\Edge_vs.vert" />
     <None Include="Shader\GenDLDepthMap_fs.frag" />
     <None Include="Shader\GenDLDepthMap_vs.vert" />
+    <None Include="Shader\GenPLDepthMap_fs.frag" />
+    <None Include="Shader\GenPLDepthMap_gs.geom" />
+    <None Include="Shader\GenPLDepthMap_vs.vert" />
     <None Include="Shader\LightShader_fs.frag" />
     <None Include="Shader\LightShader_vs.vert" />
     <None Include="Shader\normalMap_fs.frag" />
