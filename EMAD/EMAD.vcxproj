@@ -173,6 +173,7 @@
     <ClCompile Include="Object\Drawable\SkyBox.cpp" />
     <ClCompile Include="Object\Drawable\TestCube2.cpp" />
     <ClCompile Include="Object\Drawable\TestPlane.cpp" />
+    <ClCompile Include="Object\Drawable\TestQuad.cpp" />
     <ClCompile Include="Object\Light\DirectLight.cpp" />
     <ClCompile Include="Object\Light\PointLight.cpp" />
     <ClCompile Include="Program\Program.cpp" />
@@ -202,6 +203,7 @@
     <ClInclude Include="Object\Drawable\SkyBox.h" />
     <ClInclude Include="Object\Drawable\TestCube2.h" />
     <ClInclude Include="Object\Drawable\TestPlane.h" />
+    <ClInclude Include="Object\Drawable\TestQuad.h" />
     <ClInclude Include="Object\EObject.h" />
     <ClInclude Include="Object\Geometry\Sphere.h" />
     <ClInclude Include="Object\Light\DirectLight.h" />
@@ -213,8 +215,12 @@
     <ClInclude Include="Surface\Surface.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Shader\DebugQuadMap_fs.frag" />
+    <None Include="Shader\DebugQuadMap_vs.vert" />
     <None Include="Shader\Edge_fs.frag" />
     <None Include="Shader\Edge_vs.vert" />
+    <None Include="Shader\GenDLDepthMap_fs.frag" />
+    <None Include="Shader\GenDLDepthMap_vs.vert" />
     <None Include="Shader\LightShader_fs.frag" />
     <None Include="Shader\LightShader_vs.vert" />
     <None Include="Shader\normalMap_fs.frag" />

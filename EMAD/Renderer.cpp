@@ -8,6 +8,8 @@
 
 #include "Object/Drawable/TestCube2.h"
 #include "Object/Drawable/TestPlane.h"
+#include "Object/Drawable/TestQuad.h"
+
 #include "Object/Drawable/SkyBox.h"
 #include "Object/Drawable/Model/Model.h"
 
@@ -77,7 +79,13 @@ int App::run()
     std::shared_ptr<Program> NormalVisualShaderPtr =
         std::make_shared<Program>("Shader/NormalVisual_vs.vert", "Shader/NormalVisual_fs.frag", "Shader/NormalVisual_gs.geom");
     std::shared_ptr<Program> SkyBoxShaderPtr = std::make_shared<Program>("Shader/Skybox_vs.vert", "Shader/Skybox_fs.frag");
+
+    std::shared_ptr<Program> GenDLDepthMapPtr = std::make_shared<Program>("Shader/GenDLDepthMap_vs.vert", "Shader/GenDLDepthMap_fs.frag");
+    std::shared_ptr<Program> DebugQuadMapPtr = std::make_shared<Program>("Shader/DebugQuadMap_vs.vert", "Shader/DebugQuadMap_fs.frag");
     std::shared_ptr<Program> CubeShadowShaderPtr = std::make_shared<Program>("Shader/ShadowMapCube_vs.vert", "Shader/ShadowMapCube_fs.frag");
+
+    // 
+    std::shared_ptr<TestQuad> testQuad = std::make_shared<TestQuad>();
 
     // 将所有着色器的vpTrans(uniform块)设置为绑定点0
     unsigned int pointLightIndex = glGetUniformBlockIndex(PointLightShaderPtr->getProgram(), "vpTrans");
@@ -106,7 +114,7 @@ int App::run()
     //std::shared_ptr<Model> testModel = std::make_shared<Model>("Resource/Models/nono/nanosuit.obj");
     //std::shared_ptr<Model> testModel = std::make_shared<Model>("Resource/Models/Sponza/sponza.obj");
 
-    // 创建帧缓冲对象，存储深度缓冲纹理(在定向光的视角下)
+    // 创建帧缓冲对象，用于存储深度缓冲纹理(在定向光的视角下)
     GLuint depthMapFBO;
     glGenFramebuffers(1, &depthMapFBO);
 
@@ -153,6 +161,36 @@ int App::run()
         SkyBoxShaderPtr->setMatrix("realView", glm::mat4(glm::mat3(mCamera->getView())));
         mSkyBox->draw(SkyBoxShaderPtr);
 
+        
+        // 第一步，获得从定向光角度看的深度缓冲
+        // 此深度缓冲作为第二次渲染时的阴影映射
+        glViewport(0, 0, 1024, 1024);
+        glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
+        glClear(GL_DEPTH_BUFFER_BIT);
+        
+        // 定向光使用正交投影
+        GLfloat near_plane = 1.0f, far_plane = 10.0f;
+        glm::mat4 dlProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+        glm::mat4 dlView = glm::lookAt(-mDirectLight->getDirection(), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 dlSpaceMat = dlProjection * dlView;
+
+        GenDLDepthMapPtr->activate();
+        GenDLDepthMapPtr->setMatrix("dlSpaceMat", dlSpaceMat);
+        mTestCube1->draw(GenDLDepthMapPtr);
+        mTestCube2->draw(GenDLDepthMapPtr);
+        mTestCube3->draw(GenDLDepthMapPtr);
+        mTestPlane1->draw(GenDLDepthMapPtr);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+        // 第二步，正常绘制
+        glViewport(0, 0, (float)mWindow.getRectangle().first, (float)mWindow.getRectangle().second);
+        DebugQuadMapPtr->activate();
+        DebugQuadMapPtr->setFloat("near_plane", near_plane);
+        DebugQuadMapPtr->setFloat("far_plane", far_plane);
+        testQuad->setTexture(depthMap);
+        testQuad->draw(DebugQuadMapPtr);
+
+        /*
         NormalMapShaderPtr->activate();
         // vertex shader constant buffer
         NormalMapShaderPtr->setVec3("PointLightPos", mPointLight->getPosition());
@@ -188,7 +226,11 @@ int App::run()
         mTestCube1->draw(CubeShadowShaderPtr);
         mTestCube2->draw(CubeShadowShaderPtr);
         mTestCube3->draw(CubeShadowShaderPtr);
+
         genCtrlGui();
+        */
+
+
         glfwSwapBuffers(mWindow.window());
         glfwPollEvents();
     }
