@@ -54,11 +54,11 @@ App::App(int width, int height, const std::string& name) noexcept
     mTestCube1->setRotation(glm::vec3{ glm::radians(-45.0f), 0.0f, 0.0f });
 
     mTestCube2 = std::make_shared<TestCube2>("Cube2");
-    mTestCube2->setPosition(glm::vec3{ 1.0f, -1.0f, -1.0f });
-    mTestCube2->setRotation(glm::vec3{ 0.0f, glm::radians(45.0f), 0.0f });
+    mTestCube2->setPosition(glm::vec3{ 0.0f, -2.4f, 0.0f });
+    //mTestCube2->setRotation(glm::vec3{ 0.0f, glm::radians(45.0f), 0.0f });
 
     mTestCube3 = std::make_shared<TestCube2>("Cube3");
-    mTestCube3->setPosition(glm::vec3{ -1.0f, 0.0f, 1.0f });
+    mTestCube3->setPosition(glm::vec3{ -2.0f, -0.9f, 1.0f });
 
     mTestPlane1 = std::make_shared<TestPlane>("Plane1");
     mTestPlane1->setPosition(glm::vec3{ 0.0f, -3.0f, 0.0f });
@@ -126,8 +126,10 @@ int App::run()
     glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 1024, 1024, 0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+    GLfloat borderColor[] = { 1.0, 1.0, 1.0, 1.0 };
+    glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, borderColor);
     // 将2D纹理以深度缓冲附件的形式绑定到帧缓冲中
     glBindFramebuffer(GL_FRAMEBUFFER, depthMapFBO);
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthMap, 0);
@@ -169,7 +171,7 @@ int App::run()
         glClear(GL_DEPTH_BUFFER_BIT);
         
         // 定向光使用正交投影
-        GLfloat near_plane = 1.0f, far_plane = 10.0f;
+        GLfloat near_plane = 1.0f, far_plane = 100.0f;
         glm::mat4 dlProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
         glm::mat4 dlView = glm::lookAt(-mDirectLight->getDirection(), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
         glm::mat4 dlSpaceMat = dlProjection * dlView;
@@ -184,14 +186,26 @@ int App::run()
 
         // 第二步，正常绘制
         glViewport(0, 0, (float)mWindow.getRectangle().first, (float)mWindow.getRectangle().second);
+
+        //debug
+        /*
         DebugQuadMapPtr->activate();
         DebugQuadMapPtr->setFloat("near_plane", near_plane);
         DebugQuadMapPtr->setFloat("far_plane", far_plane);
         testQuad->setTexture(depthMap);
         testQuad->draw(DebugQuadMapPtr);
-
-        /*
+        */
+        PointLightShaderPtr->activate();
+        mPointLight->setScale(glm::vec3{ 0.1f, 0.1f, 0.1f });
+        mPointLight->draw(PointLightShaderPtr);
+        
         NormalMapShaderPtr->activate();
+        // bind shadowMap
+        NormalMapShaderPtr->setInt("dlShadowMap", 2);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        // dlLightSpaceMatrix
+        NormalMapShaderPtr->setMatrix("dlSpaceMat", dlSpaceMat);
         // vertex shader constant buffer
         NormalMapShaderPtr->setVec3("PointLightPos", mPointLight->getPosition());
         NormalMapShaderPtr->setVec3("DirectLightDir", mDirectLight->getDirection());
@@ -206,12 +220,15 @@ int App::run()
         NormalMapShaderPtr->setFloat("directLight.ambient", mDirectLight->getAmbient());
         NormalMapShaderPtr->setFloat("directLight.specular", mDirectLight->getSpecular());
 
-        PointLightShaderPtr->activate();
-        mPointLight->setScale(glm::vec3{ 0.1f, 0.1f, 0.1f });
-        mPointLight->draw(PointLightShaderPtr);
         mTestPlane1->draw(NormalMapShaderPtr);
        
         CubeShadowShaderPtr->activate();
+        // bind shadowMap
+        CubeShadowShaderPtr->setInt("dlShadowMap", 2);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, depthMap);
+        // dlLightSpaceMatrix
+        CubeShadowShaderPtr->setMatrix("dlSpaceMat", dlSpaceMat);
         // point light
         CubeShadowShaderPtr->setVec3("pointLight.posInView", glm::vec3{ mCamera->getView() * glm::vec4{ mPointLight->getPosition(), 1.0f} });
         CubeShadowShaderPtr->setVec3("pointLight.diffuse", mPointLight->getColor());
@@ -228,7 +245,6 @@ int App::run()
         mTestCube3->draw(CubeShadowShaderPtr);
 
         genCtrlGui();
-        */
 
 
         glfwSwapBuffers(mWindow.window());

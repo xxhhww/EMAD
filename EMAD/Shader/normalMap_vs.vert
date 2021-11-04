@@ -11,6 +11,7 @@ layout (std140) uniform vpTrans{
 
 out VS_OUT {
     vec3 FragPos;
+    vec4 PosInDLSpace; //在定向光的投影空间中的顶点坐标
     vec2 TexCoords;
     vec3 TangentFragPos;
     // view
@@ -21,6 +22,7 @@ out VS_OUT {
 } vs_out;
 
 uniform mat4 model;
+uniform mat4 dlSpaceMat;
 
 uniform vec3 PointLightPos;
 uniform vec3 DirectLightDir;
@@ -29,7 +31,8 @@ uniform vec3 viewPos;
 void main()
 {
     gl_Position = projection * view * model * vec4(position, 1.0f);
-    vs_out.FragPos = vec3(model * vec4(position, 1.0));   
+    vs_out.FragPos = vec3(model * vec4(position, 1.0f));
+    vs_out.PosInDLSpace = dlSpaceMat * model * vec4(position, 1.0f);
     vs_out.TexCoords = texCoords;
     
     mat3 normalMatrix = transpose(inverse(mat3(model)));

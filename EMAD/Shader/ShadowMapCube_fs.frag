@@ -1,5 +1,6 @@
 #version 330 core
 in vec3 posInView;
+in vec4 posInDLSpace;
 in vec3 normalInView;
 in vec2 texcoord;
 
@@ -31,17 +32,49 @@ struct Material{
 };
 uniform Material material;
 
+uniform sampler2D dlShadowMap;
+
 // 函数声明
+float calcShadow(vec3 normal, vec3 lightDir);
 vec3 calcPointLight(PointLight light, vec3 pos, vec3 normal);
 vec3 calcDirecLight(DirectLight light, vec3 pos, vec3 normal);
 
 void main()
 {
-    vec3 plColor = calcPointLight(pointLight, posInView, normalInView);
+    //vec3 plColor = calcPointLight(pointLight, posInView, normalInView);
     vec3 dlColor = calcDirecLight(directLight, posInView, normalInView);
 
     //FragColor = texture(material.diffuse, texcoord);
-    FragColor = vec4((plColor + dlColor), 1.0f);
+    FragColor = vec4(dlColor, 1.0f);
+}
+
+float calcShadow(vec3 normal, vec3 lightDir){
+    // 执行透视除法
+    vec3 projCoords = posInDLSpace.xyz / posInDLSpace.w;
+    projCoords = projCoords * 0.5 + 0.5;
+    // 采样
+    float closestDepth = texture(dlShadowMap, projCoords.xy).r;
+    // 当前像素点在定向光的投影空间下的深度
+    float currentDepth = projCoords.z;
+    // 偏移量
+    float bias = max(0.05 * (1.0 - dot(normal, lightDir)), 0.005);
+    float shadow = 0.0;
+    vec2 texelSize = 1.0 / textureSize(dlShadowMap, 0);
+    for(int x = -1; x <= 1; ++x)
+    {
+        for(int y = -1; y <= 1; ++y)
+        {
+            float pcfDepth = texture(dlShadowMap, projCoords.xy + vec2(x, y) * texelSize).r; 
+            shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;        
+        }    
+    }
+    shadow /= 9.0;
+
+    // 超出定向光的视锥的远平面
+    if(projCoords.z > 1.0)
+        shadow = 0.0;
+
+    return shadow;
 }
 
 vec3 calcPointLight(PointLight light, vec3 pos, vec3 normal){
@@ -91,5 +124,5 @@ vec3 calcDirecLight(DirectLight light, vec3 pos, vec3 normal){
     float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
     specularColor = specularFactor * light.specular * texture(material.specular, texcoord).rgb;
 
-    return ambientColor + diffuseColor + specularColor;
+    return ambientColor + (1 - calcShadow(normal, lightDir))* (diffuseColor + specularColor);
 }
