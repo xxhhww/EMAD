@@ -1,5 +1,6 @@
 #version 330 core
 in vec3 posInView;
+in vec3 posInWorld;
 in vec4 posInDLSpace;
 in vec3 normalInView;
 in vec2 texcoord;
@@ -23,6 +24,8 @@ struct PointLight{
     float specular;
 };
 uniform PointLight pointLight;
+uniform vec3 pointLightPos; // 点光源在世界坐标中的位置
+uniform float far_plane;
 
 // 物体材质信息
 struct Material{
@@ -33,22 +36,24 @@ struct Material{
 uniform Material material;
 
 uniform sampler2D dlShadowMap;
+uniform samplerCube plShadowMap;
 
 // 函数声明
-float calcShadow(vec3 normal, vec3 lightDir);
+float calcDLShadow(vec3 normal, vec3 lightDir);
+float calcPLShadow(vec3 normal, vec3 lightDir);
 vec3 calcPointLight(PointLight light, vec3 pos, vec3 normal);
 vec3 calcDirecLight(DirectLight light, vec3 pos, vec3 normal);
 
 void main()
 {
-    //vec3 plColor = calcPointLight(pointLight, posInView, normalInView);
+    vec3 plColor = calcPointLight(pointLight, posInView, normalInView);
     vec3 dlColor = calcDirecLight(directLight, posInView, normalInView);
 
     //FragColor = texture(material.diffuse, texcoord);
-    FragColor = vec4(dlColor, 1.0f);
+    FragColor = vec4((plColor + dlColor), 1.0f);
 }
 
-float calcShadow(vec3 normal, vec3 lightDir){
+float calcDLShadow(vec3 normal, vec3 lightDir){
     // 执行透视除法
     vec3 projCoords = posInDLSpace.xyz / posInDLSpace.w;
     projCoords = projCoords * 0.5 + 0.5;
@@ -75,6 +80,33 @@ float calcShadow(vec3 normal, vec3 lightDir){
     if(projCoords.z > 1.0)
         shadow = 0.0;
 
+    return shadow;
+}
+
+float calcPLShadow(vec3 normal, vec3 lightDir){
+    // Get vector between fragment position and light position
+    vec3 fragToLight = posInWorld - pointLightPos;
+    // Now get current linear depth as the length between the fragment and light position
+    float currentDepth = length(fragToLight);
+    // Now test for shadows
+    float shadow = 0.0f;
+    float bias = 0.05f; 
+    float samples = 4.0f;
+    float offset = 0.1f;
+    for(float x = -offset; x < offset; x += offset / (samples * 0.5f))
+    {
+        for(float y = -offset; y < offset; y += offset / (samples * 0.5f))
+        {
+            for(float z = -offset; z < offset; z += offset / (samples * 0.5f))
+            {
+                float closestDepth = texture(plShadowMap, fragToLight + vec3(x, y, z)).r; 
+                closestDepth *= far_plane;   // Undo mapping [0;1]
+                if(currentDepth - bias > closestDepth)
+                    shadow += 1.0f;
+            }
+        }
+    }
+    shadow /= (samples * samples * samples);
     return shadow;
 }
 
@@ -105,7 +137,9 @@ vec3 calcPointLight(PointLight light, vec3 pos, vec3 normal){
     float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
     specularColor = specularFactor * light.specular * texture(material.specular, texcoord).rgb * attenuation;
 
-    return ambientColor + diffuseColor + specularColor;
+    return ambientColor + (diffuseColor + specularColor);
+    // calcPLShadow的偏移量有些问题
+    //return ambientColor + (1 - calcPLShadow(normal, lightDir)) * (diffuseColor + specularColor);
 }
 
 vec3 calcDirecLight(DirectLight light, vec3 pos, vec3 normal){
@@ -125,5 +159,5 @@ vec3 calcDirecLight(DirectLight light, vec3 pos, vec3 normal){
     float specularFactor = pow(max(dot(viewDir, reflectDir), 0.0f), material.shininess);
     specularColor = specularFactor * light.specular * texture(material.specular, texcoord).rgb;
 
-    return ambientColor +  (1 - calcShadow(normal, lightDir))* (diffuseColor + specularColor);
+    return ambientColor +  (1 - calcDLShadow(normal, lightDir))* (diffuseColor + specularColor);
 }

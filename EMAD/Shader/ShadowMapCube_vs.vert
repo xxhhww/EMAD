@@ -8,6 +8,7 @@ layout (std140) uniform vpTrans{
 };
 
 out vec3 posInView;
+out vec3 posInWorld;
 out vec4 posInDLSpace;
 out vec3 normalInView;
 out vec2 texcoord;
@@ -19,6 +20,7 @@ void main()
 {
 	gl_Position = projection * view * model * vec4(vPosition, 1.0f);
 	posInView = vec3(view * model * vec4(vPosition, 1.0f));
+	posInWorld vec3(model * vec4(vPosition, 1.0f));
 	posInDLSpace = dlSpaceMat * model * vec4(vPosition, 1.0f);
 	normalInView = vec3(view * model * vec4(vNormal, 0.0f));
 	texcoord = vTexcoord;

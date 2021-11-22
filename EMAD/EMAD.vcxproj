@@ -158,6 +158,14 @@
     <ClCompile Include="EMain.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="Graphics\Buffer\DynamicVertex.cpp" />
+    <ClCompile Include="Graphics\GPUContext.cpp" />
+    <ClCompile Include="Graphics\GPUDevice.cpp" />
+    <ClCompile Include="Graphics\GPUPipeline.cpp" />
+    <ClCompile Include="Graphics\GPUResource.cpp" />
+    <ClCompile Include="Graphics\Shader\GPUProgram.cpp" />
+    <ClCompile Include="Graphics\Shader\GPUShader.cpp" />
+    <ClCompile Include="Graphics\Texture\GPUTexture.cpp" />
     <ClCompile Include="GWin\GWin.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
@@ -185,6 +193,17 @@
   <ItemGroup>
     <ClInclude Include="EMath.h" />
     <ClInclude Include="Exception.h" />
+    <ClInclude Include="Graphics\Buffer\DynamicVertex.h" />
+    <ClInclude Include="Graphics\Buffer\FrameBuffer.h" />
+    <ClInclude Include="Graphics\Buffer\UniformBuffer.h" />
+    <ClInclude Include="Graphics\Buffer\VertexBuffer.h" />
+    <ClInclude Include="Graphics\GPUContext.h" />
+    <ClInclude Include="Graphics\GPUDevice.h" />
+    <ClInclude Include="Graphics\GPUPipeline.h" />
+    <ClInclude Include="Graphics\GPUResource.h" />
+    <ClInclude Include="Graphics\Shader\GPUProgram.h" />
+    <ClInclude Include="Graphics\Shader\GPUShader.h" />
+    <ClInclude Include="Graphics\Texture\GPUTexture.h" />
     <ClInclude Include="GWin\GWin.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
