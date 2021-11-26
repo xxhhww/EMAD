@@ -22,12 +22,14 @@ size_t VertexLayout::GetByteLength() const
 	return (i.mOffset + GetByteSizeByType(i.mAttrType));
 }
 
-Vertex::Vertex(const VertexLayout& layout, void* data)
+Vertex::Vertex(const VertexLayout& layout, char* data)
 	:mLayout(layout)
 	,mData(data){}
 
-VertexDataArray::VertexDataArray(const VertexLayout& layout)
-	:mLayout(std::move(const_cast<VertexLayout&>(layout))){}
+VertexDataArray::VertexDataArray(const VertexLayout& layout, size_t nums)
+	:mLayout(std::move(const_cast<VertexLayout&>(layout))){
+	Resize(nums * mLayout.GetByteLength());
+}
 
 void VertexDataArray::BindVBO() const
 {

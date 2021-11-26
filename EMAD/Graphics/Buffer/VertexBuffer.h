@@ -6,6 +6,8 @@
 // OpenGLÖÐµÄVAO
 class VertexBuffer : public GPUResource {
 public:
+	using ptr = std::shared_ptr<VertexBuffer>;
+public:
 	// ÎÞIndex
 	VertexBuffer(const std::string& name, const VertexDataArray& vda, GPUDevice* device)
 		:GPUResource(name, ResourceType::VertexBuffer, device) 

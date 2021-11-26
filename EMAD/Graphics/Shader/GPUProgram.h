@@ -1,5 +1,6 @@
 #pragma once
 #include "../GPUResource.h"
+#include "../Buffer/UniformBuffer.h"
 #include "GPUShader.h"
 
 #include <vector>
@@ -7,6 +8,8 @@
 static const std::string sDirectory = "Shader/"; // 着色器所在目录
 
 class GPUProgram : public GPUResource {
+public:
+	using ptr = std::shared_ptr<GPUProgram>;
 public:
 	GPUProgram(const std::string& name, GPUDevice* device)
 		:GPUResource(name, ResourceType::Program, device){}

@@ -155,6 +155,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="EApp.cpp" />
     <ClCompile Include="EMain.cpp" />
     <ClCompile Include="Exception.cpp" />
     <ClCompile Include="glad.c" />
@@ -191,6 +192,7 @@
     <ClCompile Include="Surface\Surface.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EApp.h" />
     <ClInclude Include="EMath.h" />
     <ClInclude Include="Exception.h" />
     <ClInclude Include="Graphics\Buffer\DynamicVertex.h" />

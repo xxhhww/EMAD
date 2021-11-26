@@ -7,11 +7,6 @@
 #include "Buffer/UniformBuffer.h"
 #include "Buffer/FrameBuffer.h"
 
-GPUDevice::GPUDevice()
-{
-	mMainContext = std::make_shared<GPUContext>(this);
-}
-
 std::shared_ptr<GPUTexture> GPUDevice::CreateGPUTexture(const std::string& name, std::shared_ptr<GPUSampler>& sampler, std::shared_ptr<GPUTexDesc>& desc)
 {
 	if (mResources.find(name) == mResources.end()) {

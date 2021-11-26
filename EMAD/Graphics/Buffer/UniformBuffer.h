@@ -3,6 +3,9 @@
 
 class UniformBuffer : public GPUResource {
 public:
+	using ptr = std::shared_ptr<UniformBuffer>;
+
+public:
 	UniformBuffer(const std::string& name, GLenum usage, size_t bufferSize, GPUDevice* device, void* data = nullptr)
 		:GPUResource(name, ResourceType::UniformBuffer, device) {
 
@@ -15,12 +18,8 @@ public:
 
 	// 填充数据
 	inline void FillBuffer(size_t offset, size_t size, void* data = nullptr) {
+		Activate();
 		glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
-	}
-
-	// 将UBO对象绑定到对应的Uniform块上
-	inline void BindBuffer(unsigned int bindIndex, size_t offset, size_t size) {
-		glBindBufferRange(GL_UNIFORM_BUFFER, bindIndex, mResourceID, offset, size);
 	}
 
 public:

@@ -114,7 +114,7 @@ private:
 class Vertex {
 friend class VertexDataArray;
 public:
-	Vertex(const VertexLayout& parent, void* data);
+	Vertex(const VertexLayout& parent, char* data);
 
 	template<AttrType type>
 	auto& Attr(unsigned int index = 0u) {
@@ -150,14 +150,14 @@ private:
 	}
 private:
 	const VertexLayout& mLayout;
-	void* mData = nullptr; // 从VertexDataArray映射出来的数据
+	char* mData = nullptr; // 从VertexDataArray映射出来的数据
 };
 
 
 // 存放顶点数据的数组
 class VertexDataArray {
 public:
-	VertexDataArray(const VertexLayout& layout);
+	VertexDataArray(const VertexLayout& layout, size_t nums = 0);
 
 	// 空间分配策略可能比较低效，后续再改进
 	template<typename ...Args>

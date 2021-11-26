@@ -1,11 +1,11 @@
-#include "Renderer.h"
+#include "EApp.h"
 #include "Exception.h"
 
 #include <iostream>
 
 int main() {
 	try {
-		return App{ 1280, 720 }.run();
+		return EApp{ 1280, 720 }.Run();
 	}
     catch (const BaseException& e) {
         std::cout << e.what() << std::endl;
