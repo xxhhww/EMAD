@@ -51,7 +51,7 @@ GPUTexDesc::ptr GPUTexDesc::GenCube(GLuint level, GLuint iFormat, GLsizei width,
 	return temp;
 }
 
-GPUTexture::GPUTexture(const std::string& name, GPUSampler::ptr sampler, GPUTexDesc::ptr texDesc, GPUDevice* device, void* data)
+GPUTexture::GPUTexture(const std::string& name, GPUSampler::ptr sampler, GPUTexDesc::ptr texDesc, GPUDevice* device)
 	:GPUResource(name, ResourceType::Texture, device)
 	,mSampler(sampler)
 	,mTexDesc(texDesc){
@@ -69,7 +69,7 @@ GPUTexture::GPUTexture(const std::string& name, GPUSampler::ptr sampler, GPUTexD
 				0, 
 				mTexDesc->SourceFormat, 
 				mTexDesc->DataType,
-				data);
+				nullptr);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, mSampler->WRAPS);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, mSampler->WRAPT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, mSampler->MinFilter);
@@ -78,8 +78,6 @@ GPUTexture::GPUTexture(const std::string& name, GPUSampler::ptr sampler, GPUTexD
 		break;
 	case GL_TEXTURE_3D:
 	case GL_TEXTURE_CUBE_MAP:
-		// TODO 对data数据进行序列化读取
-		/*
 		glBindTexture(GL_TEXTURE_CUBE_MAP, mResourceID);
 		for (size_t i = 0; i < 6; i++) {
 			glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
@@ -99,7 +97,6 @@ GPUTexture::GPUTexture(const std::string& name, GPUSampler::ptr sampler, GPUTexD
 		glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, mSampler->MagFilter);
 		glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
 		break;
-		*/
 	default:
 		break;
 	}

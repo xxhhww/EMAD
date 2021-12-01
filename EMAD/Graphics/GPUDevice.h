@@ -8,6 +8,7 @@
 
 class GPUContext;
 class GPUProgram;
+class AssetTexture;
 class GPUTexture;
 class GPUSampler;
 class GPUTexDesc;
@@ -27,11 +28,24 @@ public:
 		return mMainContext;
 	}
 
+	// Create Texture2D Which is Loaded From Users' file
+	std::shared_ptr<AssetTexture> CreateAssetTexture2D(const std::string& fileName, std::shared_ptr<GPUSampler>& sampler, bool isFlip = false);
+	// Create CubeTexture Which is Loaded From Users' file
+	std::shared_ptr<AssetTexture> CreateAssetCubeTexture(std::vector<std::string>& fileNames, std::shared_ptr<GPUSampler>& sampler, bool isFlip = false);
+
+	// Create Texture Which is used as RenderTarget
 	std::shared_ptr<GPUTexture> CreateGPUTexture(const std::string& name, std::shared_ptr<GPUSampler>& sampler, std::shared_ptr<GPUTexDesc>& desc);
+	
+	// Create Shader Program
 	std::shared_ptr<GPUProgram> CreateGPUProgram(const std::string& name);
+
+	// Create Vertex Buffer Without Index
 	std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::string& name, const VertexDataArray& vda);
+	// Create Vertex Buffer With Index
 	std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::string& name, const VertexDataArray& vda, const std::vector<unsigned int>& idv);
+
 	std::shared_ptr<UniformBuffer> CreateUniformBuffer(const std::string& name, GLenum usage, size_t bufferSize);
+
 	std::shared_ptr<FrameBuffer> CreateFrameBuffer(const std::string& name);
 
 private:

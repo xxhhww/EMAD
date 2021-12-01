@@ -1,11 +1,29 @@
 #include "GPUDevice.h"
 
 #include "GPUContext.h"
+#include "Texture/AssetTexture.h"
 #include "Texture/GPUTexture.h"
 #include "Shader/GPUProgram.h"
 #include "Buffer/VertexBuffer.h"
 #include "Buffer/UniformBuffer.h"
 #include "Buffer/FrameBuffer.h"
+
+std::shared_ptr<AssetTexture> GPUDevice::CreateAssetTexture2D(const std::string& fileName, std::shared_ptr<GPUSampler>& sampler, bool isFlip)
+{
+	if (mResources.find(fileName) == mResources.end()) {
+		mResources.insert(std::make_pair(fileName, std::make_shared<AssetTexture>(fileName, sampler, isFlip, this)));
+	}
+	return std::dynamic_pointer_cast<AssetTexture>(mResources[fileName]);
+}
+
+std::shared_ptr<AssetTexture> GPUDevice::CreateAssetCubeTexture(std::vector<std::string>& fileNames, std::shared_ptr<GPUSampler>& sampler, bool isFlip)
+{
+	std::string tempName = AssetTexture::GenResourceName(fileNames);
+	if (mResources.find(tempName) == mResources.end()) {
+		mResources.insert(std::make_pair(tempName, std::make_shared<AssetTexture>(tempName, sampler, isFlip, this)));
+	}
+	return std::dynamic_pointer_cast<AssetTexture>(mResources[tempName]);
+}
 
 std::shared_ptr<GPUTexture> GPUDevice::CreateGPUTexture(const std::string& name, std::shared_ptr<GPUSampler>& sampler, std::shared_ptr<GPUTexDesc>& desc)
 {

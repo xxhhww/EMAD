@@ -41,8 +41,8 @@ public:
 	using ptr = std::shared_ptr<GPUTexture>;
 
 public:
-	// 对于渲染目标纹理，data一般都是nullptr，对于用户资产纹理，data一般是进过序列化之后的数据
-	GPUTexture(const std::string& name, GPUSampler::ptr sampler, GPUTexDesc::ptr texDesc, GPUDevice* device, void* data = nullptr);
+	// 用作渲染目标的纹理的构造函数
+	GPUTexture(const std::string& name, GPUSampler::ptr sampler, GPUTexDesc::ptr texDesc, GPUDevice* device);
 
 	inline GPUSampler::ptr GetSampler() const {
 		return mSampler;

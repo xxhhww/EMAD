@@ -17,7 +17,7 @@ Texture::ptr TextureMgr::LoadTexture2D(const std::string& dir, const std::string
     stbi_set_flip_vertically_on_load(isFlip);
     unsigned char* data = stbi_load(tag.c_str(), &width, &height, &nrComponents, 0);
     if (data) {
-        GLenum format;
+        GLenum format = GL_RGBA;
         if (nrComponents == 1)
             format = GL_RED;
         else if (nrComponents == 3)

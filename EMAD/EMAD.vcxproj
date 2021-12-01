@@ -164,8 +164,11 @@
     <ClCompile Include="Graphics\GPUDevice.cpp" />
     <ClCompile Include="Graphics\GPUPipeline.cpp" />
     <ClCompile Include="Graphics\GPUResource.cpp" />
+    <ClCompile Include="Graphics\Material\Material.cpp" />
+    <ClCompile Include="Graphics\Material\MaterialParameter.cpp" />
     <ClCompile Include="Graphics\Shader\GPUProgram.cpp" />
     <ClCompile Include="Graphics\Shader\GPUShader.cpp" />
+    <ClCompile Include="Graphics\Texture\AssetTexture.cpp" />
     <ClCompile Include="Graphics\Texture\GPUTexture.cpp" />
     <ClCompile Include="GWin\GWin.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
@@ -188,6 +191,11 @@
     <ClCompile Include="Program\Program.cpp" />
     <ClCompile Include="Program\Shader.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Render\MainRender.cpp" />
+    <ClCompile Include="Render\RenderBuffers.cpp" />
+    <ClCompile Include="Render\RenderContext.cpp" />
+    <ClCompile Include="Render\RenderList.cpp" />
+    <ClCompile Include="Render\RenderView.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Surface\Surface.cpp" />
   </ItemGroup>
@@ -203,8 +211,12 @@
     <ClInclude Include="Graphics\GPUDevice.h" />
     <ClInclude Include="Graphics\GPUPipeline.h" />
     <ClInclude Include="Graphics\GPUResource.h" />
+    <ClInclude Include="Graphics\Material\Material.h" />
+    <ClInclude Include="Graphics\Material\MaterialInfo.h" />
+    <ClInclude Include="Graphics\Material\MaterialParameter.h" />
     <ClInclude Include="Graphics\Shader\GPUProgram.h" />
     <ClInclude Include="Graphics\Shader\GPUShader.h" />
+    <ClInclude Include="Graphics\Texture\AssetTexture.h" />
     <ClInclude Include="Graphics\Texture\GPUTexture.h" />
     <ClInclude Include="GWin\GWin.h" />
     <ClInclude Include="ImGui\imconfig.h" />
@@ -232,6 +244,12 @@
     <ClInclude Include="Program\Program.h" />
     <ClInclude Include="Program\Shader.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Render\DrawCall.h" />
+    <ClInclude Include="Render\MainRender.h" />
+    <ClInclude Include="Render\RenderBuffers.h" />
+    <ClInclude Include="Render\RenderContext.h" />
+    <ClInclude Include="Render\RenderList.h" />
+    <ClInclude Include="Render\RenderView.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Surface\Surface.h" />
   </ItemGroup>
