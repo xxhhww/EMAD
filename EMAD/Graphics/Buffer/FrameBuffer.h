@@ -4,6 +4,8 @@
 
 class FrameBuffer : public GPUResource {
 public:
+	using ptr = std::shared_ptr<FrameBuffer>;
+
 	FrameBuffer(const std::string& name, GPUDevice* device)
 		:GPUResource(name, ResourceType::FrameBuffer, device) {
 		glGenFramebuffers(1, &mResourceID);

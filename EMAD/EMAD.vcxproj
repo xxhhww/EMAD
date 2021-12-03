@@ -158,6 +158,8 @@
     <ClCompile Include="EApp.cpp" />
     <ClCompile Include="EMain.cpp" />
     <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="Geometry\Quad.cpp" />
+    <ClCompile Include="Geometry\Sphere.cpp" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="Graphics\Buffer\DynamicVertex.cpp" />
     <ClCompile Include="Graphics\GPUContext.cpp" />
@@ -170,6 +172,7 @@
     <ClCompile Include="Graphics\Shader\GPUShader.cpp" />
     <ClCompile Include="Graphics\Texture\AssetTexture.cpp" />
     <ClCompile Include="Graphics\Texture\GPUTexture.cpp" />
+    <ClCompile Include="Graphics\Texture\ShaderResource.cpp" />
     <ClCompile Include="GWin\GWin.cpp" />
     <ClCompile Include="ImGui\imgui.cpp" />
     <ClCompile Include="ImGui\imgui_demo.cpp" />
@@ -192,6 +195,9 @@
     <ClCompile Include="Program\Shader.cpp" />
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Render\MainRender.cpp" />
+    <ClCompile Include="Render\Pass\GBufferPass.cpp" />
+    <ClCompile Include="Render\Pass\LightPass.cpp" />
+    <ClCompile Include="Render\Pass\RenderPass.cpp" />
     <ClCompile Include="Render\RenderBuffers.cpp" />
     <ClCompile Include="Render\RenderContext.cpp" />
     <ClCompile Include="Render\RenderList.cpp" />
@@ -203,6 +209,8 @@
     <ClInclude Include="EApp.h" />
     <ClInclude Include="EMath.h" />
     <ClInclude Include="Exception.h" />
+    <ClInclude Include="Geometry\Quad.h" />
+    <ClInclude Include="Geometry\Sphere.h" />
     <ClInclude Include="Graphics\Buffer\DynamicVertex.h" />
     <ClInclude Include="Graphics\Buffer\FrameBuffer.h" />
     <ClInclude Include="Graphics\Buffer\UniformBuffer.h" />
@@ -218,6 +226,7 @@
     <ClInclude Include="Graphics\Shader\GPUShader.h" />
     <ClInclude Include="Graphics\Texture\AssetTexture.h" />
     <ClInclude Include="Graphics\Texture\GPUTexture.h" />
+    <ClInclude Include="Graphics\Texture\ShaderResource.h" />
     <ClInclude Include="GWin\GWin.h" />
     <ClInclude Include="ImGui\imconfig.h" />
     <ClInclude Include="ImGui\imgui.h" />
@@ -246,6 +255,9 @@
     <ClInclude Include="Renderer.h" />
     <ClInclude Include="Render\DrawCall.h" />
     <ClInclude Include="Render\MainRender.h" />
+    <ClInclude Include="Render\Pass\GBufferPass.h" />
+    <ClInclude Include="Render\Pass\LightPass.h" />
+    <ClInclude Include="Render\Pass\RenderPass.h" />
     <ClInclude Include="Render\RenderBuffers.h" />
     <ClInclude Include="Render\RenderContext.h" />
     <ClInclude Include="Render\RenderList.h" />
@@ -258,13 +270,19 @@
     <None Include="Shader\DebugQuadMap_vs.vert" />
     <None Include="Shader\Edge_fs.frag" />
     <None Include="Shader\Edge_vs.vert" />
+    <None Include="Shader\Material\DeferredMaterial.frag" />
+    <None Include="Shader\Material\DeferredMaterial.vert" />
     <None Include="Shader\GenDLDepthMap_fs.frag" />
     <None Include="Shader\GenDLDepthMap_vs.vert" />
     <None Include="Shader\GenPLDepthMap_fs.frag" />
     <None Include="Shader\GenPLDepthMap_gs.geom" />
     <None Include="Shader\GenPLDepthMap_vs.vert" />
+    <None Include="Shader\LightPass\LightPass.frag" />
+    <None Include="Shader\LightPass\LightPass.vert" />
     <None Include="Shader\LightShader_fs.frag" />
     <None Include="Shader\LightShader_vs.vert" />
+    <None Include="Shader\Material\ForwardMaterial.frag" />
+    <None Include="Shader\Material\ForwardMaterial.vert" />
     <None Include="Shader\normalMap_fs.frag" />
     <None Include="Shader\normalMap_vs.vert" />
     <None Include="Shader\NormalVisual_fs.frag" />

@@ -4,9 +4,9 @@
 #include <sstream>
 
 AssetTexture::AssetTexture(const std::string& fileName, GPUSampler::ptr sampler, bool isFlip, GPUDevice* device)
-	:GPUResource(fileName, GPUResource::ResourceType::Texture, device)
-	,mSampler(sampler)
-{
+	:ShaderResource(fileName, GPUResource::ResourceType::Texture, device){
+    mSampler = sampler;
+
 	glGenTextures(1, &mResourceID);
 
     std::string tag = sTexDirectory + fileName;
@@ -45,9 +45,9 @@ AssetTexture::AssetTexture(const std::string& fileName, GPUSampler::ptr sampler,
 }
 
 AssetTexture::AssetTexture(std::vector<std::string>& fileNames, GPUSampler::ptr sampler, bool isFlip, GPUDevice* device)
-	:GPUResource(GenResourceName(fileNames), GPUResource::ResourceType::Texture, device)
-	,mSampler(sampler)
-{
+	:ShaderResource(GenResourceName(fileNames), GPUResource::ResourceType::Texture, device){
+    mSampler = sampler;
+
     for (auto& i : fileNames) {
         i = sTexDirectory + i;
     }

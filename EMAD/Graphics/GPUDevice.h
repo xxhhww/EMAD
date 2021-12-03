@@ -24,8 +24,24 @@ public:
 		mMainContext = std::make_shared<GPUContext>(this);
 	}
 
+	static GPUDevice* Instance() {
+		GPUDevice _sDevice;
+		return &_sDevice;
+	}
+
 	inline std::shared_ptr<GPUContext> GetContext() {
 		return mMainContext;
+	}
+
+	// 检查Device是否已经创建并存放了以name命名的GPUResource
+	inline bool HasGPUResource(const std::string& name) {
+		return mResources.find(name) == mResources.end() ? false : true;
+	}
+
+	// 配合HasGPUResource使用
+	template<typename T>
+	std::shared_ptr<T> Get(const std::string& name) {
+		return std::dynamic_pointer_cast<T>(mResources[name]);
 	}
 
 	// Create Texture2D Which is Loaded From Users' file

@@ -27,8 +27,8 @@ int EApp::Run()
 		this->HandleInput(deltaTime);
 
 		// Clear Buffer & Fill Screen
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		mDevicePtr->GetContext()->FillColor(0.2f, 0.3f, 0.3f, 1.0f);
+		mDevicePtr->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		mDevicePtr->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
 		// Draw Objects
 		VertexLayout tVertexLayout;
