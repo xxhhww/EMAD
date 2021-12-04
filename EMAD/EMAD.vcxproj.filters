@@ -162,6 +162,9 @@
     <ClCompile Include="Graphics\Material\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Geometry\Cube.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GWin\GWin.h">
@@ -341,6 +344,9 @@
     <ClInclude Include="Core\NonCopyable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Geometry\Cube.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shader\test_vs.vert" />
@@ -373,5 +379,9 @@
     <None Include="Shader\Material\DeferredMaterial.frag" />
     <None Include="Shader\Material\ForwardMaterial.vert" />
     <None Include="Shader\Material\ForwardMaterial.frag" />
+    <None Include="Shader\Debug\DebugSphere.vert" />
+    <None Include="Shader\Debug\DebugSphere.frag" />
+    <None Include="Shader\Debug\DebugCube.frag" />
+    <None Include="Shader\Debug\DebugCube.vert" />
   </ItemGroup>
 </Project>

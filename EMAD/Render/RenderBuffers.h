@@ -10,6 +10,8 @@
 class GPUTexture;
 
 struct RenderBuffers {
+	RenderBuffers();
+
 	struct GBuffer {
 		std::shared_ptr<GPUTexture> BaseColor; // Diffuse Color
 		std::shared_ptr<GPUTexture> Position; // World Position

@@ -41,7 +41,8 @@ std::shared_ptr<VertexBuffer> Sphere::GetVB(unsigned int stack, unsigned int sli
 
 	for (unsigned int i = 0; i <= stack; ++i) {
 		// 获得当前经线与起始经线的夹角
-		float theta = E_PI * i / stack;
+		// float theta = E_PI * i / stack;
+		float theta = E_PI / 2 - i * E_PI / stack;
 
 		// 遍历当前经线上的切分点
 		for (unsigned int j = 0; j <= slice; ++j) {
@@ -50,12 +51,12 @@ std::shared_ptr<VertexBuffer> Sphere::GetVB(unsigned int stack, unsigned int sli
 
 			// 计算当前切分点的位置
 			glm::vec3 pos;
-			pos.x = radius * sin(theta) * cos(phi);
-			pos.y = radius * sin(theta) * sin(phi);
-			pos.z = cos(theta);
+			pos.x = radius * cos(theta) * cos(phi);
+			pos.y = radius * cos(theta) * sin(phi);
+			pos.z = radius * sin(theta);
 
 			// 插入数据至容器
-			SphereVertexArray.EmplaceBack(pos, glm::vec2{ i / stack, j / slice }, pos);
+			SphereVertexArray.EmplaceBack(pos, glm::vec2{ (float)j / slice, (float)i / stack }, pos);
 		}
 	}
 

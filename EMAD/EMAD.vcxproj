@@ -72,22 +72,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD\EMAD;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\xhw\source\repos\EMAD\ThirdParty\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD\EMAD;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\xhw\source\repos\EMAD\ThirdParty\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD\EMAD;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\xhw\source\repos\EMAD\ThirdParty\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD\EMAD;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\xhw\source\repos\EMAD\ThirdParty\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -158,6 +158,7 @@
     <ClCompile Include="EApp.cpp" />
     <ClCompile Include="EMain.cpp" />
     <ClCompile Include="Exception.cpp" />
+    <ClCompile Include="Geometry\Cube.cpp" />
     <ClCompile Include="Geometry\Quad.cpp" />
     <ClCompile Include="Geometry\Sphere.cpp" />
     <ClCompile Include="glad.c" />
@@ -211,6 +212,7 @@
     <ClInclude Include="EApp.h" />
     <ClInclude Include="EMath.h" />
     <ClInclude Include="Exception.h" />
+    <ClInclude Include="Geometry\Cube.h" />
     <ClInclude Include="Geometry\Quad.h" />
     <ClInclude Include="Geometry\Sphere.h" />
     <ClInclude Include="Graphics\Buffer\DynamicVertex.h" />
@@ -269,6 +271,10 @@
   <ItemGroup>
     <None Include="Shader\DebugQuadMap_fs.frag" />
     <None Include="Shader\DebugQuadMap_vs.vert" />
+    <None Include="Shader\Debug\DebugCube.frag" />
+    <None Include="Shader\Debug\DebugCube.vert" />
+    <None Include="Shader\Debug\DebugSphere.frag" />
+    <None Include="Shader\Debug\DebugSphere.vert" />
     <None Include="Shader\Edge_fs.frag" />
     <None Include="Shader\Edge_vs.vert" />
     <None Include="Shader\Material\DeferredMaterial.frag" />

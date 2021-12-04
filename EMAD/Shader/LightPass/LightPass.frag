@@ -1,7 +1,7 @@
 #version 450 core
 // LightPass.frag的计算处于世界坐标之下
 
-in FSIn{
+in VSOut{
 	vec3 fPosition;
 	vec2 fTexcoord;
 } fsin;

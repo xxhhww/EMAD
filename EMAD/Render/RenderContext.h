@@ -11,6 +11,8 @@ class GPUContext;
 // 渲染上下文，记录渲染所需的信息
 class RenderContext : public std::enable_shared_from_this<RenderContext>{
 public:
+	using ptr = std::shared_ptr<RenderContext>;
+public:
 	// 初始化函数
 	RenderContext();
 

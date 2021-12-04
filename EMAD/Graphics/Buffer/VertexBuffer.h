@@ -31,6 +31,11 @@ public:
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, idv.size() * sizeof(unsigned int), idv.data(), GL_STATIC_DRAW);
 		glBindVertexArray(0);
 	}
+
+	inline unsigned int GetIndexSize() const {
+		return mIndexSize;
+	}
+
 public:
 	// [From GPUResource]
 	inline virtual void Activate() override {

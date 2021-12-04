@@ -5,7 +5,7 @@ layout(location = 1) out vec3 GPosition;
 layout(location = 2) out vec3 GNormal;
 layout(location = 3) out vec3 GOther; // Metallic/Roughness/Ao
 
-in FSIn{
+in VSOut{
 	in vec3 fPosition;
 	in vec2 fTexcoord;
 	in vec3 fNormal;
