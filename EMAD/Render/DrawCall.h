@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 class VertexBuffer;
@@ -29,6 +30,10 @@ struct DrawCall {
 		std::shared_ptr<VertexBuffer> VertexBufferPtr;
 		// 顶点索引的开始绘制位置
 		unsigned int StartIndex;
+		// 索引个数
+		unsigned int IndexSize;
+		// 图元拓扑
+		GLenum Mode;
 	} MyGeometryData;
 
 	// 需要绘制的物体的材质信息

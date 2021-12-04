@@ -1,6 +1,9 @@
 #pragma once
 
 #include "GPUResource.h"
+#include "../Core/Singleton.h"
+#include "../Core/NonCopyable.h"
+
 #include <map>
 #include <string>
 #include <vector>
@@ -18,15 +21,10 @@ class VertexDataArray;
 class FrameBuffer;
 
 // GPU设备，用于创建GPU资源与GPU上下文
-class GPUDevice {
+class GPUDevice : public Singleton<GPUDevice>, public NonCopyable {
 public:
 	GPUDevice() {
 		mMainContext = std::make_shared<GPUContext>(this);
-	}
-
-	static GPUDevice* Instance() {
-		GPUDevice _sDevice;
-		return &_sDevice;
 	}
 
 	inline std::shared_ptr<GPUContext> GetContext() {

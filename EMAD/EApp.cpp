@@ -21,7 +21,7 @@ int EApp::Run()
 		// HandleInput
 		float aspect = (float)mWindow.getRectangle().first / (float)mWindow.getRectangle().second;
 		mCamera->setAspect(aspect);
-		float currentFrame = glfwGetTime();
+		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		this->HandleInput(deltaTime);

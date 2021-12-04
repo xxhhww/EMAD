@@ -15,7 +15,7 @@ public:
 	}
 
 	// 对pass对应的DrawCall进行排序
-	// Sort DrawCall By Depth
+	// Sort DrawCall By Depth(用于正确显示透明物体的透明特性?)
 	void SortDrawCall(DrawCallPass pass);
 
 	// 执行pass对应的DrawCall命令

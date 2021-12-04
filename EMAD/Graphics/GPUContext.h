@@ -65,7 +65,11 @@ public:
 
 	// 清理之前所绑定的渲染资源
 	inline void CleanUp() {
-
+		mFrameBuffer = nullptr;
+		mVertexBuffer = nullptr;
+		mProgram = nullptr;
+		mUniformBuffers.clear();
+		mTextures.clear();
 	}
 
 	// Draw Without Indices
@@ -75,11 +79,19 @@ public:
 	void DrawElements(GLenum mode, unsigned int count, unsigned int offset = 0);
 private:
 	struct TextureWithIndex {
+		TextureWithIndex(unsigned int id, std::shared_ptr<ShaderResource> tex)
+			:index(id)
+			,texture(tex) {}
+
 		unsigned int index;
 		std::shared_ptr<ShaderResource> texture;
 	};
 
 	struct UniformWithIndex {
+		UniformWithIndex(unsigned int id, std::shared_ptr<UniformBuffer> un)
+			:index(id)
+			,uniform(un) {}
+
 		unsigned int index;
 		std::shared_ptr<UniformBuffer> uniform;
 	};

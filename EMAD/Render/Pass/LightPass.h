@@ -4,7 +4,7 @@
 
 class RenderContext;
 
-class LightPass : public RenderPass {
+class LightPass : public RenderPass<LightPass> {
 public:
 	// 装载着色器等资源
 	virtual void Init() override;

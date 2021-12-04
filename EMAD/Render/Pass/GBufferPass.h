@@ -6,7 +6,7 @@ class GPUContext;
 class RenderContext;
 class FrameBuffer;
 
-class GBufferPass : public RenderPass {
+class GBufferPass : public RenderPass<GBufferPass> {
 public:
 	// 装配着色器等资源
 	virtual void Init() override;

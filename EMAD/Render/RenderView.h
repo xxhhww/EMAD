@@ -15,12 +15,12 @@ struct RenderView {
 	float MyFovy;
 
 	// 视图变换矩阵
-	glm::vec3 MyViewTrans;
+	glm::mat4 MyViewTrans;
 
 	bool isProj = true;
 	// 透视变换矩阵/正交变换矩阵
 	union {
-		glm::vec3 MyProjTrans;
-		glm::vec3 MyOrthoTrans;
+		glm::mat4 MyProjTrans;
+		glm::mat4 MyOrthoTrans;
 	};
 };

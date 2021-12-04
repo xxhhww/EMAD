@@ -27,6 +27,9 @@ void GPUContext::DrawArrays(GLenum mode, unsigned int first, unsigned int count)
 	glBindVertexArray(mVertexBuffer->GetResourceID());
 	// DrawArrays
 	glDrawArrays(mode, first, count);
+
+	// Clean Up
+	CleanUp();
 }
 
 void GPUContext::DrawElements(GLenum mode, unsigned int count, unsigned int offset)
@@ -44,10 +47,13 @@ void GPUContext::DrawElements(GLenum mode, unsigned int count, unsigned int offs
 	// Bind Shader Resource
 	for (const auto& i : mTextures) {
 		glActiveTexture(GL_TEXTURE0 + i.index);
-		glBindTexture(i.texture->GetTexDesc()->Type, i.tex->GetResourceID());
+		glBindTexture(i.texture->GetTexDesc()->Type, i.texture->GetResourceID());
 	}
 	// Bind VertexBuffer
 	glBindVertexArray(mVertexBuffer->GetResourceID());
 	// DrawElements
 	glDrawElements(mode, count, GL_UNSIGNED_INT, (const void*)offset);
+
+	// Clear Up
+	CleanUp();
 }

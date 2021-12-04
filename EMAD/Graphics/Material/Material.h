@@ -1,27 +1,22 @@
 #pragma once
 
-#include "../GPUContext.h"
-#include "../Shader/GPUProgram.h"
-#include "../Buffer/UniformBuffer.h"
-#include "MaterialParameter.h"
+#include <memory>
+
+class RenderContext;
+class DrawCall;
 
 class Material {
 public:
+	using ptr = std::shared_ptr<Material>;
+
 	struct BindInfo {
-		std::shared_ptr<GPUContext> Context;
+		std::shared_ptr<RenderContext> MyRenderContext;
+		std::shared_ptr<DrawCall> MyDrawCall;
 	};
 
 public:
-	Material();
-
+	// 初始化
+	virtual void Init() = 0;
 	// 将材质的数据绑定到GPUContext
-	void Bind(BindInfo& bindInfo);
-private:
-	MaterialParas mParas; // 着色器需要的材质参数
-	std::shared_ptr<GPUProgram> mProgram; // 材质对应的着色器
-	std::shared_ptr<UniformBuffer> mUniformBuffer0; // Shader Data
-	std::shared_ptr<UniformBuffer> mUniformBuffer1; // Light Data (only for forward render)
-
-	std::vector<char> mData0;
-	std::vector<char> mData1;
+	virtual void Bind(BindInfo& bindinfo) = 0;
 };

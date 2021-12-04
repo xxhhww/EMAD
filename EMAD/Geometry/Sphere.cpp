@@ -18,7 +18,7 @@ std::shared_ptr<VertexBuffer> Sphere::GetVB()
 // 详情见 http://www.songho.ca/opengl/gl_sphere.html
 // stack表示球沿着经线划分的个数
 // slice表示球沿着纬线划分的个数
-std::shared_ptr<VertexBuffer> Sphere::GetVB(int stack, int slice)
+std::shared_ptr<VertexBuffer> Sphere::GetVB(unsigned int stack, unsigned int slice)
 {
 	assert(stack >= 3);
 	assert(slice >= 3);

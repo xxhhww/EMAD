@@ -72,22 +72,22 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\xhw\source\repos\EMAD\ThirdParty\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\xhw\source\repos\EMAD\ThirdParty\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\xhw\source\repos\EMAD\ThirdParty\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\xhw\source\repos\EMAD\ThirdParty\include;C:\Users\xhw\source\repos\EMAD;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\xhw\source\repos\EMAD\ThirdParty\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -166,8 +166,8 @@
     <ClCompile Include="Graphics\GPUDevice.cpp" />
     <ClCompile Include="Graphics\GPUPipeline.cpp" />
     <ClCompile Include="Graphics\GPUResource.cpp" />
+    <ClCompile Include="Graphics\Material\DeferredMaterial.cpp" />
     <ClCompile Include="Graphics\Material\Material.cpp" />
-    <ClCompile Include="Graphics\Material\MaterialParameter.cpp" />
     <ClCompile Include="Graphics\Shader\GPUProgram.cpp" />
     <ClCompile Include="Graphics\Shader\GPUShader.cpp" />
     <ClCompile Include="Graphics\Texture\AssetTexture.cpp" />
@@ -206,6 +206,8 @@
     <ClCompile Include="Surface\Surface.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Core\NonCopyable.h" />
+    <ClInclude Include="Core\Singleton.h" />
     <ClInclude Include="EApp.h" />
     <ClInclude Include="EMath.h" />
     <ClInclude Include="Exception.h" />
@@ -219,9 +221,8 @@
     <ClInclude Include="Graphics\GPUDevice.h" />
     <ClInclude Include="Graphics\GPUPipeline.h" />
     <ClInclude Include="Graphics\GPUResource.h" />
+    <ClInclude Include="Graphics\Material\DeferredMaterial.h" />
     <ClInclude Include="Graphics\Material\Material.h" />
-    <ClInclude Include="Graphics\Material\MaterialInfo.h" />
-    <ClInclude Include="Graphics\Material\MaterialParameter.h" />
     <ClInclude Include="Graphics\Shader\GPUProgram.h" />
     <ClInclude Include="Graphics\Shader\GPUShader.h" />
     <ClInclude Include="Graphics\Texture\AssetTexture.h" />

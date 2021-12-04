@@ -120,12 +120,6 @@
     <ClCompile Include="EApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Graphics\Material\Material.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Graphics\Material\MaterialParameter.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Graphics\Texture\AssetTexture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -160,6 +154,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Geometry\Sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Material\DeferredMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\Material\Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -290,15 +290,6 @@
     <ClInclude Include="EApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Graphics\Material\Material.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Material\MaterialInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Graphics\Material\MaterialParameter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Graphics\Texture\AssetTexture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -336,6 +327,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Geometry\Sphere.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Material\DeferredMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Graphics\Material\Material.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Singleton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\NonCopyable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
