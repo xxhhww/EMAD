@@ -1,7 +1,7 @@
 #pragma once
-#include "Graphics/GPUDevice.h"
-#include "Graphics/GPUContext.h"
-#include "GWin/GWin.h"
+
+#include <memory>
+#include <string>
 
 class Camera;
 class EApp {
@@ -11,15 +11,15 @@ public:
 	int Run();
 
 private:
-	void DebugPBRRun();
+	void DebugDeferredRun();
 	void DebugSphereRun();
+	void DebugQuadRun();
 	void DebugTriangleRun();
+	void DebugFrameBufferRun();
 
 private:
 	// ¥¶¿Ìº¸ Û ‰»Î
 	void HandleInput(float dt);
 private:
-	GWin mWindow;
-
 	std::shared_ptr<Camera> mCamera;
 };

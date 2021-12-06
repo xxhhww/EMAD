@@ -4,6 +4,8 @@
 
 // RenderView描述如何看待需要渲染的Object
 struct RenderView {
+	using ptr = std::shared_ptr<RenderView>;
+
 	// 视点
 	glm::vec3 MyViewPos;
 

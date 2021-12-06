@@ -9,6 +9,7 @@ out VSOut{
 } vsout;
 
 void main(){
+	gl_Position = vec4(vPosition, 1.0f);
 	vsout.fPosition = vPosition;
 	vsout.fTexcoord = vTexcoord;
 }

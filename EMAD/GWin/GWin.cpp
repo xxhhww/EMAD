@@ -1,17 +1,16 @@
 #include "GWin.h"
 #include "../Exception.h"
 
-#include "../ImGui/imgui.h"
-#include "../ImGui/imgui_impl_glfw.h"
-#include "../ImGui/imgui_impl_opengl3.h"
+#include <ImGui/imgui.h>
+#include <ImGui/imgui_impl_glfw.h>
+#include <ImGui/imgui_impl_opengl3.h>
 
-#include <iostream>
-
-GWin::GWin(int width, int height, const std::string& name)
-    :mWidth(width)
-    ,mHeight(height)
-    ,mName(name)
+void GWin::Init(int width, int height, const std::string& name)
 {
+    mWidth = width;
+    mHeight = height;
+    mName = name;
+
     mLastX = (double)width / 2;
     mLastY = (double)height / 2;
 

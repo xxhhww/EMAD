@@ -11,6 +11,13 @@ void GPUContext::DrawArrays(GLenum mode, unsigned int first, unsigned int count)
 	// Bind FrameBuffer
 	if (mFrameBuffer != nullptr) {
 		glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer->GetResourceID());
+		ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer->GetResourceID());
+	}
+	else {
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		ClearColor(0.7f, 0.1f, 0.5f, 1.0f);
 	}
 	// Activate ShaderProgram
 	mProgram->Activate();
@@ -37,6 +44,12 @@ void GPUContext::DrawElements(GLenum mode, unsigned int count, unsigned int offs
 	// Bind FrameBuffer
 	if (mFrameBuffer != nullptr) {
 		glBindFramebuffer(GL_FRAMEBUFFER, mFrameBuffer->GetResourceID());
+		ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+	}
+	else {
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	}
 	// Activate ShaderProgram
 	mProgram->Activate();

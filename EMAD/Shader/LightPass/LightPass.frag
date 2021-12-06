@@ -16,10 +16,10 @@ layout(std140, binding = 0) uniform ShaderData{
 	vec3 LightPos;
 };
 
-uniform sampler2D BaseColor;
-uniform sampler2D Position;
-uniform sampler2D Normal;
-uniform sampler2D Other;
+layout (binding = 0) uniform sampler2D BaseColor;
+layout (binding = 1) uniform sampler2D Position;
+layout (binding = 2) uniform sampler2D Normal;
+layout (binding = 3) uniform sampler2D Other;
 
 float DistributionGGX(vec3 N, vec3 H, float roughness);
 float GeometrySchlickGGX(float NdotV, float roughness);

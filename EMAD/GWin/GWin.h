@@ -1,15 +1,18 @@
 #pragma once
+#include <Core/Singleton.h>
+#include <Core/NonCopyable.h>
+
+#include <string>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <string>
-
 //´°¿ÚÀà
-class GWin {
+class GWin : public Singleton<GWin>, public NonCopyable {
 public:
-	GWin(int width, int height, const std::string& name);
+	//GWin(int width, int height, const std::string& name);
 	~GWin();
+	void Init(int width, int height, const std::string& name);
 
 	GLFWwindow* window() noexcept { return mWindow; }
 

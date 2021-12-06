@@ -18,6 +18,10 @@ public:
 		mBaseColorTex = tex;
 	}
 
+	inline void SetNormalTex(std::shared_ptr<AssetTexture> tex) {
+		mNormalTex = tex;
+	}
+
 	inline void SetMetallicTex(std::shared_ptr<AssetTexture> tex) {
 		mMetallicTex = tex;
 	}
@@ -34,6 +38,7 @@ private:
 	std::shared_ptr<UniformBuffer> mUniformBuffer;
 	// 用户纹理资产
 	std::shared_ptr<AssetTexture> mBaseColorTex;
+	std::shared_ptr<AssetTexture> mNormalTex;
 	std::shared_ptr<AssetTexture> mMetallicTex;
 	std::shared_ptr<AssetTexture> mRoughnessTex;
 	std::shared_ptr<AssetTexture> mAoTex;

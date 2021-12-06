@@ -19,6 +19,7 @@ void GPUProgram::Activate()
 			return;
 		}
 		mIsLink = true;
+		mShaders.clear();
 	}
 	glUseProgram(mResourceID);
 }

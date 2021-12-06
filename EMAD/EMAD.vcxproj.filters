@@ -383,5 +383,9 @@
     <None Include="Shader\Debug\DebugSphere.frag" />
     <None Include="Shader\Debug\DebugCube.frag" />
     <None Include="Shader\Debug\DebugCube.vert" />
+    <None Include="Shader\Debug\DebugQuad.vert" />
+    <None Include="Shader\Debug\DebugQuad.frag" />
+    <None Include="Shader\Debug\DebugFrameBuffer.frag" />
+    <None Include="Shader\Debug\DebugFrameBuffer.vert" />
   </ItemGroup>
 </Project>

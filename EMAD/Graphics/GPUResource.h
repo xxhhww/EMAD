@@ -36,6 +36,10 @@ public:
 		return mResourceID; 
 	}
 
+	inline void SetID(unsigned int id) {
+		mResourceID = id;
+	}
+
 	inline const std::string& GetName() const { 
 		return mName; 
 	}

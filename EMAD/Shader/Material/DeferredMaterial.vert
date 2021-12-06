@@ -1,7 +1,6 @@
 #version 450 core
-
 layout(location = 0) in vec3 vPosition;
-layout(location = 1) in vec3 vTexcoord;
+layout(location = 1) in vec2 vTexcoord;
 layout(location = 2) in vec3 vNormal;
 
 layout(std140, binding = 0) uniform Trans{
@@ -12,7 +11,7 @@ layout(std140, binding = 0) uniform Trans{
 
 out VSOut{
 	vec3 fPosition;
-	vec3 fTexcoord;
+	vec2 fTexcoord;
 	vec3 fNormal;
 } vsout;
 

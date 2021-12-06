@@ -23,9 +23,7 @@ class FrameBuffer;
 // GPU设备，用于创建GPU资源与GPU上下文
 class GPUDevice : public Singleton<GPUDevice>, public NonCopyable {
 public:
-	GPUDevice() {
-		mMainContext = std::make_shared<GPUContext>(this);
-	}
+	GPUDevice();
 
 	inline std::shared_ptr<GPUContext> GetContext() {
 		return mMainContext;

@@ -13,7 +13,7 @@ public:
 
 	// 添加颜色附件
 	inline void AttachColor(unsigned int index, std::shared_ptr<GPUTexture> tex) {
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, tex->GetResourceID(), 0);
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + index, GL_TEXTURE_2D, tex->GetResourceID(), 0);
 	}
 
 	// 添加深度缓存
@@ -39,10 +39,10 @@ public:
 public:
 	// [From GPUResource]
 	inline virtual void Activate() override {
-		glBindBuffer(GL_FRAMEBUFFER, mResourceID);
+		glBindFramebuffer(GL_FRAMEBUFFER, mResourceID);
 	}
 	// [From GPUResource]
 	inline virtual void InActivate() override {
-		glBindBuffer(GL_FRAMEBUFFER, 0);
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 };

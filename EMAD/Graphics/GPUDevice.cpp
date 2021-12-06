@@ -8,6 +8,11 @@
 #include "Buffer/UniformBuffer.h"
 #include "Buffer/FrameBuffer.h"
 
+GPUDevice::GPUDevice()
+{
+	mMainContext = std::make_shared<GPUContext>(this);
+}
+
 std::shared_ptr<AssetTexture> GPUDevice::CreateAssetTexture2D(const std::string& fileName, std::shared_ptr<GPUSampler> sampler, bool isFlip)
 {
 	if (mResources.find(fileName) == mResources.end()) {

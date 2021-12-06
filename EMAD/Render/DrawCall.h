@@ -46,5 +46,5 @@ struct DrawCall {
 	glm::vec3 MyWorldPosition;
 
 	// 需要绘制的物体的缩放情况
-	glm::mat4 MyScaling;
+	glm::vec3 MyScaling;
 };

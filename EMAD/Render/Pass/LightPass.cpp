@@ -40,7 +40,7 @@ void LightPass::Render(std::shared_ptr<RenderContext> rContext)
 	TestShaderData tempShaderData;
 	tempShaderData.viewPos = rContext->mRenderView->MyViewPos;
 	tempShaderData.lightColor = glm::vec3{ 23.47f, 21.31f, 20.79f };
-	tempShaderData.lightPos = glm::vec3{ 0.0f, 0.0f, 0.0f };
+	tempShaderData.lightPos = glm::vec3{ 0.0f, 0.0f, 3.0f };
 	ShaderDataUB->FillBuffer(0, sizeof(TestShaderData), &tempShaderData);
 
 	gContext->BindUB(0, ShaderDataUB);

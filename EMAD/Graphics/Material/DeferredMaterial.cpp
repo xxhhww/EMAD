@@ -29,9 +29,10 @@ void DeferredMaterial::Bind(BindInfo& bindinfo)
 	gContext->BindProgram(mShaderProgram);
 	// Bind SR
 	gContext->BindSR(0, mBaseColorTex);
-	gContext->BindSR(1, mMetallicTex);
-	gContext->BindSR(2, mRoughnessTex);
-	gContext->BindSR(3, mAoTex);
+	gContext->BindSR(1, mNormalTex);
+	gContext->BindSR(2, mMetallicTex);
+	gContext->BindSR(3, mRoughnessTex);
+	gContext->BindSR(4, mAoTex);
 	// Bind UB
 	TransData tempTransData;
 	tempTransData.modelTrans = bindinfo.MyDrawCall->MyModelTrans;

@@ -11,6 +11,7 @@ class GPUTexture;
 
 struct RenderBuffers {
 	RenderBuffers();
+	~RenderBuffers();
 
 	struct GBuffer {
 		std::shared_ptr<GPUTexture> BaseColor; // Diffuse Color

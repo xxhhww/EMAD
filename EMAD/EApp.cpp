@@ -1,22 +1,41 @@
 #include "EApp.h"
 #include "Object/Camera/Camera.h"
+#include <GWin/GWin.h>
+#include <Graphics/GPUDevice.h>
+#include <Graphics/GPUContext.h>
 #include <Graphics/Texture/AssetTexture.h>
 #include <Graphics/Buffer/VertexBuffer.h>
+#include <Graphics/Buffer/FrameBuffer.h>
 #include <Graphics/Shader/GPUProgram.h>
+#include <Graphics/Material/DeferredMaterial.h>
 #include <Geometry/Sphere.h>
 #include <Geometry/Cube.h>
+#include <Geometry/Quad.h>
 #include <Render/MainRender.h>
+#include <Render/DrawCall.h>
+#include <Render/RenderView.h>
+#include <Render/RenderList.h>
+#include <Render/RenderBuffers.h>
 #include <Render/RenderContext.h>
+#include <Render/Pass/GBufferPass.h>
+#include <Render/Pass/LightPass.h>
 
-EApp::EApp(int width, int height, const std::string& name)
-	:mWindow(width, height, name){
+#include <iostream>
+
+EApp::EApp(int width, int height, const std::string& name){
+
+	// 初始化渲染窗口
+	GWin::Instance()->Init(width, height, name);
+	// 初始化渲染服务
+	RenderService::Instance()->Init();
+
+	// 初始化摄像机
 	mCamera = std::make_shared<Camera>();
+
 	// 启动深度缓冲测试
 	glEnable(GL_DEPTH_TEST);
 	// 启动模板测试
 	glEnable(GL_STENCIL_TEST);
-	// 初始化渲染服务
-	RenderService::Instance()->Init();
 }
 
 int EApp::Run()
@@ -24,20 +43,27 @@ int EApp::Run()
 	float deltaTime = 0.0f; // 当前帧与上一帧的时间差
 	float lastFrame = 0.0f; // 上一帧的时间
 
-	while (!glfwWindowShouldClose(mWindow.window()))
+	while (!glfwWindowShouldClose(GWin::Instance()->window()))
 	{
 		// HandleInput
-		float aspect = (float)mWindow.getRectangle().first / (float)mWindow.getRectangle().second;
+		float aspect = (float)GWin::Instance()->getRectangle().first / (float)GWin::Instance()->getRectangle().second;
 		mCamera->setAspect(aspect);
 		float currentFrame = static_cast<float>(glfwGetTime());
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 		this->HandleInput(deltaTime);
 		
+		GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		//GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		//GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		//DebugTriangleRun();
-		DebugSphereRun();
+		//DebugSphereRun();
+		//DebugDeferredRun();
+		//DebugQuadRun();
+		//DebugFrameBufferRun();
 
-		glfwSwapBuffers(mWindow.window());
+		glfwSwapBuffers(GWin::Instance()->window());
 		glfwPollEvents();
 	}
 	return 0;
@@ -51,9 +77,65 @@ struct DebugTrans {
 	glm::mat4 projTrans;
 };
 
-void EApp::DebugPBRRun()
+void EApp::DebugDeferredRun()
 {
-	//RenderContext::ptr CurrentRenderContext 
+	GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+	// 当前帧的渲染上下文
+	RenderContext::ptr tempRenderContext = std::make_shared<RenderContext>();
+	tempRenderContext->SetGPUContext(GPUDevice::Instance()->GetContext());
+
+	// Create RenderView
+	RenderView::ptr tempRenderView = std::make_shared<RenderView>();
+	tempRenderView->isProj = true;
+	tempRenderView->MyViewPos = mCamera->getPosition();
+	tempRenderView->MyViewTrans = mCamera->getView();
+	tempRenderView->MyProjTrans = mCamera->getProjection();
+	tempRenderContext->SetRenderView(tempRenderView);
+
+	// Create Sphere
+	VertexBuffer::ptr SphereVB = Sphere::GetVB();
+	unsigned int IndexSize = SphereVB->GetIndexSize();
+
+	// Create Deferred Material
+	DeferredMaterial::ptr SphereMaterial = std::make_shared<DeferredMaterial>();
+	SphereMaterial->Init();
+	// Bind AssetTexture to Material
+	GPUSampler::ptr sampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	AssetTexture::ptr baseColorTex = GPUDevice::Instance()->CreateAssetTexture2D("iron/rustediron2_basecolor.png", sampler);
+	AssetTexture::ptr normalTex = GPUDevice::Instance()->CreateAssetTexture2D("iron/rustediron2_normal.png", sampler);
+	AssetTexture::ptr metallicTex = GPUDevice::Instance()->CreateAssetTexture2D("iron/rustediron2_metallic.png", sampler);
+	AssetTexture::ptr roughnessTex = GPUDevice::Instance()->CreateAssetTexture2D("iron/rustediron2_roughness.png", sampler);
+	AssetTexture::ptr aoTex = GPUDevice::Instance()->CreateAssetTexture2D("iron/rustediron2_ao.png", sampler);
+
+	SphereMaterial->SetBaseColorTex(baseColorTex);
+	SphereMaterial->SetNormalTex(normalTex);
+	SphereMaterial->SetMetallicTex(metallicTex);
+	SphereMaterial->SetRoughnessTex(roughnessTex);
+	SphereMaterial->SetAoTex(aoTex);
+
+	// Create DrawCall
+	DrawCall::ptr tempDrawCall = std::make_shared<DrawCall>();
+	tempDrawCall->MyGeometryData.Mode = GL_TRIANGLES;
+	tempDrawCall->MyGeometryData.StartIndex = 0u;
+	tempDrawCall->MyGeometryData.IndexSize = IndexSize;
+	tempDrawCall->MyGeometryData.VertexBufferPtr = SphereVB;
+	
+	tempDrawCall->MyMaterial = SphereMaterial;
+
+	tempDrawCall->MyModelTrans = glm::identity<glm::mat4>();
+	tempDrawCall->MyWorldPosition = glm::vec3{ 0.0f, 0.0f, 0.0f };
+	tempDrawCall->MyScaling = glm::vec3{ 1.0f, 1.0f, 1.0f };
+
+	// Add Draw Call To RenderContex
+	tempRenderContext->mRenderList->AddDrawCall(DrawCallPass::GBuffer, tempDrawCall);
+
+	// Render GBuffer Pass
+	GBufferPass::Instance()->Render(tempRenderContext);
+
+	// Render Light Pass
+	LightPass::Instance()->Render(tempRenderContext);
 }
 
 void EApp::DebugSphereRun()
@@ -72,9 +154,6 @@ void EApp::DebugSphereRun()
 	GPUProgram::ptr SphereProgram = GPUDevice::Instance()->CreateGPUProgram("Program_DebugSphere");
 	SphereProgram->AttachShader(ShaderType::VS, "Debug/DebugSphere.vert");
 	SphereProgram->AttachShader(ShaderType::PS, "Debug/DebugSphere.frag");
-
-	// 设置对应的纹理单元
-	glUniform1i(glGetUniformLocation(SphereProgram->GetResourceID(), "DebugTex"), 0);
 
 	// Create UniformBuffer
 	UniformBuffer::ptr SphereUniform = GPUDevice::Instance()->CreateUniformBuffer("UB_DebugSphere", GL_STATIC_DRAW, sizeof(DebugTrans));
@@ -104,6 +183,24 @@ void EApp::DebugSphereRun()
 	context->BindSR(0, SphereAssetTex);
 	context->BindVAO(SphereVertexBuffer);
 	context->DrawElements(GL_TRIANGLES, indexSize, 0u);
+}
+
+void EApp::DebugQuadRun()
+{
+	GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+	GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+
+	GPUProgram::ptr testProgram = GPUDevice::Instance()->CreateGPUProgram("Program_DebugQuad");
+	testProgram->AttachShader(ShaderType::VS, "Debug/DebugQuad.vert");
+	testProgram->AttachShader(ShaderType::PS, "Debug/DebugQuad.frag");
+
+	GPUSampler::ptr tTexSampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	AssetTexture::ptr testAssetTex = GPUDevice::Instance()->CreateAssetTexture2D("awesomeface.png", tTexSampler);
+
+	GPUDevice::Instance()->GetContext()->BindProgram(testProgram);
+	GPUDevice::Instance()->GetContext()->BindSR(0, testAssetTex);
+
+	Quad::Render(GPUDevice::Instance()->GetContext());
 }
 
 void EApp::DebugTriangleRun()
@@ -164,25 +261,100 @@ void EApp::DebugTriangleRun()
 	GPUDevice::Instance()->GetContext()->DrawArrays(GL_TRIANGLES, 0, 3);
 }
 
+void EApp::DebugFrameBufferRun()
+{
+	int srcWidth = GWin::Instance()->getRectangle().first;
+	int srcHeight = GWin::Instance()->getRectangle().second;
+
+	FrameBuffer::ptr testFrameBuffer = GPUDevice::Instance()->CreateFrameBuffer("FB_DebugFB");
+
+	// Create Color Attachment
+	GPUSampler::ptr sampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
+
+	GPUTexDesc::ptr RGBTexDesc = GPUTexDesc::Gen2D(0, GL_RGB, srcWidth, srcHeight, GL_RGB, GL_FLOAT);
+	GPUTexture::ptr testGPUTexture = GPUDevice::Instance()->CreateGPUTexture("GT_DebugFB", sampler, RGBTexDesc);
+
+	// Add Attachment
+	testFrameBuffer->Activate();
+	testFrameBuffer->AttachColor(0, testGPUTexture);
+	GLuint attachments[1] = { GL_COLOR_ATTACHMENT0 };
+	glDrawBuffers(1, attachments);
+
+	// create and attach depth buffer (renderbuffer)
+	unsigned int rboDepth;
+	glGenRenderbuffers(1, &rboDepth);
+	glBindRenderbuffer(GL_RENDERBUFFER, rboDepth);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, srcWidth, srcHeight);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, rboDepth);
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		std::cout << "Framebuffer not complete!" << std::endl;
+	testFrameBuffer->InActivate();
+	
+
+	// Create FB GPUProgram
+	GPUProgram::ptr testFBGPUProgram = GPUDevice::Instance()->CreateGPUProgram("Program_DebugFB");
+	testFBGPUProgram->AttachShader(ShaderType::VS, "Debug/DebugFrameBuffer.vert");
+	testFBGPUProgram->AttachShader(ShaderType::PS, "Debug/DebugFrameBuffer.frag");
+
+	// Create SphereVB To Draw
+	VertexBuffer::ptr SphereVB = Sphere::GetVB();
+
+	// Create UB
+	UniformBuffer::ptr testUniformBuffer = GPUDevice::Instance()->CreateUniformBuffer("UB_DebugFB", GL_STATIC_DRAW, sizeof(DebugTrans));
+	DebugTrans debugTrans;
+	debugTrans.modelTrans = glm::identity<glm::mat4>();
+	debugTrans.viewTrans = mCamera->getView();
+	debugTrans.projTrans = mCamera->getProjection();
+	testUniformBuffer->FillBuffer(0, sizeof(DebugTrans), &debugTrans);
+
+	// Draw to FrameBuffer
+	
+	GPUContext::ptr context = GPUDevice::Instance()->GetContext();
+	
+	context->BindFB(testFrameBuffer);
+	context->BindProgram(testFBGPUProgram);
+	context->BindUB(0, testUniformBuffer);
+	context->BindVAO(SphereVB);
+	context->DrawElements(GL_TRIANGLES, SphereVB->GetIndexSize(), 0u);
+	
+
+
+	// Draw Attachment to Quad
+
+	// Create Quad Program
+	GPUProgram::ptr testQuadProgram = GPUDevice::Instance()->CreateGPUProgram("Program_DebugFB_Quad");
+	testQuadProgram->AttachShader(ShaderType::VS, "Debug/DebugQuad.vert");
+	testQuadProgram->AttachShader(ShaderType::PS, "Debug/DebugQuad.frag");
+
+	
+	GPUSampler::ptr tTexSampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+	AssetTexture::ptr testAssetTex = GPUDevice::Instance()->CreateAssetTexture2D("awesomeface.png", tTexSampler);
+
+	context->BindFB(nullptr);
+	context->BindProgram(testQuadProgram);
+	context->BindSR(0, testGPUTexture);
+	Quad::Render(context);
+}
+
 void EApp::HandleInput(float dt)
 {
 	// esc为窗口退出键
-	if (glfwGetKey(mWindow.window(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(mWindow.window(), true);
+	if (glfwGetKey(GWin::Instance()->window(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		glfwSetWindowShouldClose(GWin::Instance()->window(), true);
 
-	if (!mWindow.isCursorEnabled()) {
+	if (!GWin::Instance()->isCursorEnabled()) {
 		// handle input
-		if (glfwGetKey(mWindow.window(), GLFW_KEY_W) == GLFW_PRESS)
+		if (glfwGetKey(GWin::Instance()->window(), GLFW_KEY_W) == GLFW_PRESS)
 			mCamera->translate({ 0.0f, 0.0f, dt });
-		if (glfwGetKey(mWindow.window(), GLFW_KEY_S) == GLFW_PRESS)
+		if (glfwGetKey(GWin::Instance()->window(), GLFW_KEY_S) == GLFW_PRESS)
 			mCamera->translate({ 0.0f, 0.0f, -dt });
-		if (glfwGetKey(mWindow.window(), GLFW_KEY_A) == GLFW_PRESS)
+		if (glfwGetKey(GWin::Instance()->window(), GLFW_KEY_A) == GLFW_PRESS)
 			mCamera->translate({ -dt, 0.0f, 0.0f });
-		if (glfwGetKey(mWindow.window(), GLFW_KEY_D) == GLFW_PRESS)
+		if (glfwGetKey(GWin::Instance()->window(), GLFW_KEY_D) == GLFW_PRESS)
 			mCamera->translate({ dt, 0.0f, 0.0f });
 
-		const auto cursorOffset = mWindow.getCursorOffset();
-		mWindow.setCursorOffset(0.0f, 0.0f);
+		const auto cursorOffset = GWin::Instance()->getCursorOffset();
+		GWin::Instance()->setCursorOffset(0.0f, 0.0f);
 		mCamera->rotate(cursorOffset.first, cursorOffset.second);
 	}
 }

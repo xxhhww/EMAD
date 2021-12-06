@@ -27,7 +27,7 @@
 #include <memory>
 
 App::App(int width, int height, const std::string& name) noexcept
-	:mWindow(width, height, name){
+	{
     // 启动深度缓冲测试
     glEnable(GL_DEPTH_TEST);
     // 启动模板测试
