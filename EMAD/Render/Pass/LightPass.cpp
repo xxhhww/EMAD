@@ -32,15 +32,15 @@ void LightPass::Render(std::shared_ptr<RenderContext> rContext)
 
 	// Bind UB
 	struct TestShaderData {
-		glm::vec3 viewPos;
-		glm::vec3 lightColor;
-		glm::vec3 lightPos;
+		glm::vec4 viewPos;
+		glm::vec4 lightColor;
+		glm::vec4 lightPos;
 	};
 	UniformBuffer::ptr ShaderDataUB = GPUDevice::Instance()->CreateUniformBuffer("UB_LightPass", GL_STATIC_DRAW, sizeof(TestShaderData));
 	TestShaderData tempShaderData;
-	tempShaderData.viewPos = rContext->mRenderView->MyViewPos;
-	tempShaderData.lightColor = glm::vec3{ 23.47f, 21.31f, 20.79f };
-	tempShaderData.lightPos = glm::vec3{ 0.0f, 0.0f, 3.0f };
+	tempShaderData.viewPos = glm::vec4(rContext->mRenderView->MyViewPos, 1.0f);
+	tempShaderData.lightColor = glm::vec4{ 150.0f, 150.0f, 150.0f, 0.0f };
+	tempShaderData.lightPos = glm::vec4{ 0.0f, 0.0f, 10.0f, 0.0f };
 	ShaderDataUB->FillBuffer(0, sizeof(TestShaderData), &tempShaderData);
 
 	gContext->BindUB(0, ShaderDataUB);

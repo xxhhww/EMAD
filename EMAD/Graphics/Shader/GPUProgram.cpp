@@ -1,10 +1,13 @@
 #include "GPUProgram.h"
 
 #include <iostream>
+GPUProgram::GPUProgram(const std::string& name, GPUDevice* device)
+	:GPUResource(name, ResourceType::Program, device){
+	mResourceID = glCreateProgram();
+}
 void GPUProgram::Activate()
 {
 	if (!mIsLink) {
-		mResourceID = glCreateProgram();
 		for (const auto& i : mShaders) {
 			glAttachShader(mResourceID, i->GetResourceID());
 		}

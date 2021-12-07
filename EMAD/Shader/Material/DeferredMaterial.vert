@@ -20,5 +20,5 @@ void main(){
 
 	vsout.fPosition = vec3(modelTrans * vec4(vPosition, 1.0f));
 	vsout.fTexcoord = vTexcoord;
-	vsout.fNormal = vNormal;
+	vsout.fNormal = mat3(modelTrans) * vec3(vNormal);
 }

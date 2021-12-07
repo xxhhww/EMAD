@@ -51,9 +51,9 @@ std::shared_ptr<VertexBuffer> Sphere::GetVB(unsigned int stack, unsigned int sli
 
 			// 计算当前切分点的位置
 			glm::vec3 pos;
-			pos.x = radius * cos(theta) * cos(phi);
-			pos.y = radius * cos(theta) * sin(phi);
-			pos.z = radius * sin(theta);
+			pos.z = radius * cos(theta) * cos(phi);
+			pos.x = radius * cos(theta) * sin(phi);
+			pos.y = radius * sin(theta);
 
 			// 插入数据至容器
 			SphereVertexArray.EmplaceBack(pos, glm::vec2{ (float)j / slice, (float)i / stack }, pos);

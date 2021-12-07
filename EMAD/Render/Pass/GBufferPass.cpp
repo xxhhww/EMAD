@@ -48,8 +48,11 @@ void GBufferPass::Render(std::shared_ptr<RenderContext> rContext)
 	
 	// 设置GPU上下文的FrameBuffer
 	gContext->BindFB(tempFB);
+	// 
+	gContext->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// 发布渲染命令，来填充RenderBuffers中的GBuffer
 	rContext->ExecDrawCall(DrawCallPass::GBuffer);
+	glDeleteRenderbuffers(1, &rboDepth);
 
 	/*
 	// Just Test
@@ -62,7 +65,7 @@ void GBufferPass::Render(std::shared_ptr<RenderContext> rContext)
 	AssetTexture::ptr testAssetTex = GPUDevice::Instance()->CreateAssetTexture2D("awesomeface.png", tTexSampler);
 
 	gContext->BindProgram(testProgram);
-	gContext->BindSR(0, rContext->mRenderBuffers->MyGBuffer.BaseColor);
+	gContext->BindSR(0, rContext->mRenderBuffers->MyGBuffer.Other);
 
 	Quad::Render(gContext);
 	// TODO恢复默认FrameBuffer

@@ -53,13 +53,11 @@ int EApp::Run()
 		lastFrame = currentFrame;
 		this->HandleInput(deltaTime);
 		
-		GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		//GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		//GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		//DebugTriangleRun();
 		//DebugSphereRun();
-		//DebugDeferredRun();
+		DebugDeferredRun();
 		//DebugQuadRun();
 		//DebugFrameBufferRun();
 
@@ -79,9 +77,6 @@ struct DebugTrans {
 
 void EApp::DebugDeferredRun()
 {
-	GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-
 	// 当前帧的渲染上下文
 	RenderContext::ptr tempRenderContext = std::make_shared<RenderContext>();
 	tempRenderContext->SetGPUContext(GPUDevice::Instance()->GetContext());
@@ -162,9 +157,9 @@ void EApp::DebugSphereRun()
 	glm::mat4 modelTrans{ 1.0f };
 	glm::mat4 identity{ 1.0f };
 	modelTrans *= glm::translate(identity, glm::vec3{0.0f, 0.0f, 0.0f});
-	modelTrans *= glm::rotate(identity, glm::radians(-90.0f), glm::vec3{ 1.0f, 0.0f, 0.0f });
-	modelTrans *= glm::rotate(identity, 00.0f, glm::vec3{ 0.0f, 1.0f, 0.0f });
-	modelTrans *= glm::rotate(identity, glm::radians(0.0f), glm::vec3{ 0.0f, 0.0f, 1.0f });
+	//modelTrans *= glm::rotate(identity, glm::radians(-90.0f), glm::vec3{ 1.0f, 0.0f, 0.0f });
+	//modelTrans *= glm::rotate(identity, 00.0f, glm::vec3{ 0.0f, 1.0f, 0.0f });
+	//modelTrans *= glm::rotate(identity, glm::radians(0.0f), glm::vec3{ 0.0f, 0.0f, 1.0f });
 
 	debugTrans.modelTrans = modelTrans;
 	debugTrans.viewTrans = mCamera->getView();
@@ -334,6 +329,9 @@ void EApp::DebugFrameBufferRun()
 	context->BindProgram(testQuadProgram);
 	context->BindSR(0, testGPUTexture);
 	Quad::Render(context);
+
+	glDeleteRenderbuffers(1, &rboDepth);
+
 }
 
 void EApp::HandleInput(float dt)

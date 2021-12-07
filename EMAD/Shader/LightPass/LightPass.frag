@@ -6,15 +6,15 @@ in VSOut{
 	vec2 fTexcoord;
 } fsin;
 
+layout(std140, binding = 0) uniform ShaderData{
+    vec4 viewPos;
+    vec4 LightColor;
+	vec4 LightPos;
+};
+
 out vec4 FragColor;
 
 const float PI = 3.14159265359;
-
-layout(std140, binding = 0) uniform ShaderData{
-    vec3 viewPos;
-    vec3 LightColor;
-	vec3 LightPos;
-};
 
 layout (binding = 0) uniform sampler2D BaseColor;
 layout (binding = 1) uniform sampler2D Position;
@@ -29,6 +29,8 @@ vec3 fresnelSchlick(float cosTheta, vec3 F0);
 void main(){
 	// Load Data From Texture
 	vec3 baseColor = texture(BaseColor, fsin.fTexcoord).rgb;
+    baseColor = pow(baseColor, vec3(2.2f));
+
 	vec3 worldPos = texture(Position, fsin.fTexcoord).rgb;
 	vec3 normal = texture(Normal, fsin.fTexcoord).rgb;
 	vec3 other = texture(Other, fsin.fTexcoord).rgb;
@@ -37,9 +39,9 @@ void main(){
 	float ao = other.b;
 
     vec3 N = normalize(normal);
-    vec3 V = normalize(viewPos - worldPos);
+    vec3 V = normalize(vec3(viewPos) - worldPos);
 
-    vec3 F0 = vec3(0.04); 
+    vec3 F0 = vec3(0.04f); 
     F0 = mix(F0, baseColor, metallic);
 
     // reflectance equation
@@ -47,24 +49,24 @@ void main(){
     for(int i = 0; i < 1; ++i) 
     {
         // calculate per-light radiance
-        vec3 L = normalize(LightPos - worldPos);
+        vec3 L = normalize(vec3(LightPos) - worldPos);
         vec3 H = normalize(V + L);
-        float distance    = length(LightPos - worldPos);
-        float attenuation = 1.0 / (distance * distance);
-        vec3 radiance     = LightColor * attenuation;        
+        float distance    = length(vec3(LightPos) - worldPos);
+        float attenuation = 1.0f / (distance * distance);
+        vec3 radiance     = vec3(LightColor) * attenuation;        
 
         // cook-torrance brdf
         float NDF = DistributionGGX(N, H, roughness);        
         float G   = GeometrySmith(N, V, L, roughness);      
-        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0), F0);       
+        vec3 F    = fresnelSchlick(max(dot(H, V), 0.0f), F0);       
 
         vec3 kS = F;
         vec3 kD = vec3(1.0) - kS;
         kD *= 1.0 - metallic;     
 
-        vec3 nominator    = NDF * G * F;
-        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.001; 
-        vec3 specular     = nominator / denominator;
+        vec3 numinator    = NDF * G * F;
+        float denominator = 4.0 * max(dot(N, V), 0.0) * max(dot(N, L), 0.0) + 0.0001; 
+        vec3 specular     = numinator / denominator;
 
         // add to outgoing radiance Lo
         float NdotL = max(dot(N, L), 0.0);                
@@ -75,25 +77,25 @@ void main(){
     vec3 color = ambient + Lo;
 
     color = color / (color + vec3(1.0));
-    color = pow(color, vec3(1.0/2.2));  
+    color = pow(color, vec3(1.0/2.2));
 
     FragColor = vec4(color, 1.0);
 }
 
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
-    return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+    return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
 }  
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {
     float a      = roughness*roughness;
     float a2     = a*a;
-    float NdotH  = max(dot(N, H), 0.0);
+    float NdotH  = max(dot(N, H), 0.0f);
     float NdotH2 = NdotH*NdotH;
 
     float nom   = a2;
-    float denom = (NdotH2 * (a2 - 1.0) + 1.0);
+    float denom = (NdotH2 * (a2 - 1.0f) + 1.0f);
     denom = PI * denom * denom;
 
     return nom / denom;

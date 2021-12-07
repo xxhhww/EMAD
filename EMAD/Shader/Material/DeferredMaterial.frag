@@ -25,6 +25,6 @@ void main(){
 	GNormal = fsin.fNormal;
 	
 	GOther.r = texture(MetallicTex, fsin.fTexcoord).r;
-	GOther.g = texture(MetallicTex, fsin.fTexcoord).g;
-	GOther.b = texture(MetallicTex, fsin.fTexcoord).b;
+	GOther.g = texture(RoughnessTex, fsin.fTexcoord).r;
+	GOther.b = texture(AoTex, fsin.fTexcoord).r;
 }
