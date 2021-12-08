@@ -3,14 +3,17 @@
 #include <iostream>
 #include <sstream>
 
-AssetTexture::AssetTexture(const std::string& fileName, GPUSampler::ptr sampler, bool isFlip, GPUDevice* device)
-	:ShaderResource(fileName, GPUResource::ResourceType::Texture, device){
-    mSampler = sampler;
-
+AssetTexture::AssetTexture(const std::string& name, GPUDevice* device)
+	:ShaderResource(name, GPUResource::ResourceType::Texture, device){
 	glGenTextures(1, &mResourceID);
+}
 
-    std::string tag = sTexDirectory + fileName;
+void AssetTexture::Update(const std::string& fileName, GPUSampler::ptr sampler, bool isFlip)
+{
+    // Record Sampler State
+    mSampler = sampler;
     // load data
+    std::string tag = sTexDirectory + fileName;
     int width, height, nrComponents;
     stbi_set_flip_vertically_on_load(isFlip);
     unsigned char* data = stbi_load(tag.c_str(), &width, &height, &nrComponents, 0);
@@ -40,23 +43,21 @@ AssetTexture::AssetTexture(const std::string& fileName, GPUSampler::ptr sampler,
     }
     // Error
     else {
-        std::cout << "Failed to create texture2D" << std::endl;
+        std::cout << "Failed to create texture2D: " << tag << std::endl;
     }
 }
 
-AssetTexture::AssetTexture(std::vector<std::string>& fileNames, GPUSampler::ptr sampler, bool isFlip, GPUDevice* device)
-	:ShaderResource(GenResourceName(fileNames), GPUResource::ResourceType::Texture, device){
+void AssetTexture::Update(std::vector<std::string>& fileNames, GPUSampler::ptr sampler, bool isFlip)
+{
+    // Record Sampler State
     mSampler = sampler;
-
+    // Load Data From File
+    glBindTexture(GL_TEXTURE_CUBE_MAP, mResourceID);
     for (auto& i : fileNames) {
         i = sTexDirectory + i;
     }
-
-    glGenTextures(1, &mResourceID);
-    glBindTexture(GL_TEXTURE_CUBE_MAP, mResourceID);
-
     int width, height, nrChannels;
-    for (unsigned int i = 0; i < fileNames.size(); i++){
+    for (unsigned int i = 0; i < fileNames.size(); i++) {
         // load data
         unsigned char* data = stbi_load(fileNames[i].c_str(), &width, &height, &nrChannels, 0);
         if (data) {
@@ -71,7 +72,7 @@ AssetTexture::AssetTexture(std::vector<std::string>& fileNames, GPUSampler::ptr 
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
                 0, format, width, height, 0, format, GL_UNSIGNED_BYTE, data);
             // Record Texture Description Information
-            if(mTexDesc == nullptr)
+            if (mTexDesc == nullptr)
                 mTexDesc = GPUTexDesc::Gen2D(0, format, width, height, format, GL_UNSIGNED_BYTE);
             // free data
             stbi_image_free(data);

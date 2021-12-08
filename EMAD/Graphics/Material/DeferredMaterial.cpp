@@ -15,11 +15,18 @@ struct TransData {
 
 void DeferredMaterial::Init()
 {
-	mShaderProgram = GPUDevice::Instance()->CreateGPUProgram("Program_DeferredMaterial");
+	mShaderProgram = GPUDevice::Instance()->Create<GPUProgram>("Program_DeferredMaterial");
 	mShaderProgram->AttachShader(ShaderType::VS, "Material/DeferredMaterial.vert");
 	mShaderProgram->AttachShader(ShaderType::PS, "Material/DeferredMaterial.frag");
 
-	mUniformBuffer = GPUDevice::Instance()->CreateUniformBuffer("UB_DeferredMaterial", GL_STATIC_DRAW, sizeof(TransData));
+	bool HasCreatedBuffer = GPUDevice::Instance()->HasGPUResource("UB_DeferredMaterial");
+	if (!HasCreatedBuffer) {
+		mUniformBuffer = GPUDevice::Instance()->Create<UniformBuffer>("UB_DeferredMaterial");
+		mUniformBuffer->AllocBuffer(sizeof(TransData), GL_STATIC_DRAW);
+	}
+	else {
+		mUniformBuffer = GPUDevice::Instance()->Get<UniformBuffer>("UB_DeferredMaterial");
+	}
 }
 
 void DeferredMaterial::Bind(BindInfo& bindinfo)

@@ -1,5 +1,5 @@
 #pragma once
-#include "../GPUResource.h"
+#include <Graphics/GPUResource.h>
 
 // 纹理采样信息描述
 class GPUSampler {
@@ -44,6 +44,10 @@ public:
 public:
 	ShaderResource(const std::string& name, ResourceType type, GPUDevice* device)
 		:GPUResource(name, type, device) {}
+
+	~ShaderResource() {
+		glDeleteTextures(1, &mResourceID);
+	}
 
 	inline GPUSampler::ptr GetSampler() const {
 		return mSampler;

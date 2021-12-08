@@ -76,5 +76,8 @@ std::shared_ptr<VertexBuffer> Cube::GetVB()
 		20,23,21, 20,22,23
 	};
 
-	return GPUDevice::Instance()->CreateVertexBuffer("VB_Cube", CubeVertexArray, indices);
+	VertexBuffer::ptr CubeVB = GPUDevice::Instance()->Create<VertexBuffer>("VB_Cube");
+	CubeVB->Update(CubeVertexArray, indices);
+
+	return CubeVB;
 }

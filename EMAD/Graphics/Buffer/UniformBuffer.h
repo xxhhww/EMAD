@@ -1,25 +1,30 @@
 #pragma once
-#include "../GPUResource.h"
+#include <Graphics/GPUResource.h>
 
 class UniformBuffer : public GPUResource {
 public:
 	using ptr = std::shared_ptr<UniformBuffer>;
 
 public:
-	UniformBuffer(const std::string& name, GLenum usage, size_t bufferSize, GPUDevice* device, void* data = nullptr)
+	UniformBuffer(const std::string& name, GPUDevice* device)
 		:GPUResource(name, ResourceType::UniformBuffer, device) {
-
 		glGenBuffers(1, &mResourceID);
+	}
+
+	// 分配/修改存储空间
+	inline void AllocBuffer(size_t spaceSize, GLenum usage, void* data = nullptr) {
 		glBindBuffer(GL_UNIFORM_BUFFER, mResourceID);
 		// 分配内存
-		glBufferData(GL_UNIFORM_BUFFER, bufferSize, data, usage);
+		glBufferData(GL_UNIFORM_BUFFER, spaceSize, data, usage);
 		glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
-	// 填充数据
+	// 填充存储空间
 	inline void FillBuffer(size_t offset, size_t size, void* data = nullptr) {
-		Activate();
+		glBindBuffer(GL_UNIFORM_BUFFER, mResourceID);
 		glBufferSubData(GL_UNIFORM_BUFFER, offset, size, data);
+		
+		// glBindBuffer(GL_UNIFORM_BUFFER, 0);
 	}
 
 public:

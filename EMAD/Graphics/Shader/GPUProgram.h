@@ -1,7 +1,7 @@
 #pragma once
-#include "../GPUResource.h"
-#include "../Buffer/UniformBuffer.h"
 #include "GPUShader.h"
+
+#include <Graphics/GPUResource.h>
 
 #include <vector>
 #include <map>
@@ -13,6 +13,7 @@ public:
 	using ptr = std::shared_ptr<GPUProgram>;
 public:
 	GPUProgram(const std::string& name, GPUDevice* device);
+	~GPUProgram();
 
 	// 从文件中读取着色器数据并编译，最后存放在mShaders容器中
 	inline GPUShader::ptr AttachShader(ShaderType sType, const std::string& sName) {

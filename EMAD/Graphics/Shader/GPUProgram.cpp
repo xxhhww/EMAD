@@ -5,6 +5,11 @@ GPUProgram::GPUProgram(const std::string& name, GPUDevice* device)
 	:GPUResource(name, ResourceType::Program, device){
 	mResourceID = glCreateProgram();
 }
+
+GPUProgram::~GPUProgram(){
+	glDeleteProgram(mResourceID);
+}
+
 void GPUProgram::Activate()
 {
 	if (!mIsLink) {

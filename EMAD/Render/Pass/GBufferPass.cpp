@@ -1,11 +1,10 @@
 #include "GBufferPass.h"
 
-#include "../../Graphics/GPUDevice.h"
-#include "../../Graphics/GPUContext.h"
-#include "../../Graphics/Buffer/FrameBuffer.h"
-
-#include "../RenderContext.h"
-#include "../RenderBuffers.h"
+#include <Graphics/GPUDevice.h>
+#include <Graphics/GPUContext.h>
+#include <Graphics/Buffer/FrameBuffer.h>
+#include <Render/RenderContext.h>
+#include <Render/RenderBuffers.h>
 
 // Just Test To Include
 #include <Graphics/Shader/GPUProgram.h>
@@ -15,13 +14,13 @@
 #include <iostream>
 
 void GBufferPass::Init(){
-	mFrameBuffer = nullptr;
+	GPUDevice::Instance()->Create<FrameBuffer>("FB_GBufferPass");
 }
 
 void GBufferPass::Render(std::shared_ptr<RenderContext> rContext)
 {
 	// 设置GBuffer所使用的FrameBuffer
-	FrameBuffer::ptr tempFB = GPUDevice::Instance()->CreateFrameBuffer("FB_GBufferPass");
+	FrameBuffer::ptr tempFB = GPUDevice::Instance()->Get<FrameBuffer>("FB_GBufferPass");
 	tempFB->Activate();
 	tempFB->AttachColor(0, rContext->mRenderBuffers->MyGBuffer.BaseColor);
 	tempFB->AttachColor(1, rContext->mRenderBuffers->MyGBuffer.Position);
@@ -54,18 +53,15 @@ void GBufferPass::Render(std::shared_ptr<RenderContext> rContext)
 	rContext->ExecDrawCall(DrawCallPass::GBuffer);
 	glDeleteRenderbuffers(1, &rboDepth);
 
+	
 	/*
 	// Just Test
 	gContext->BindFB(nullptr);
-	GPUProgram::ptr testProgram = GPUDevice::Instance()->CreateGPUProgram("Program_DebugGBufferQuad");
+	GPUProgram::ptr testProgram = GPUDevice::Instance()->Create<GPUProgram>("Program_DebugGBufferQuad");
 	testProgram->AttachShader(ShaderType::VS, "Debug/DebugQuad.vert");
 	testProgram->AttachShader(ShaderType::PS, "Debug/DebugQuad.frag");
-
-	GPUSampler::ptr tTexSampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-	AssetTexture::ptr testAssetTex = GPUDevice::Instance()->CreateAssetTexture2D("awesomeface.png", tTexSampler);
-
 	gContext->BindProgram(testProgram);
-	gContext->BindSR(0, rContext->mRenderBuffers->MyGBuffer.Other);
+	gContext->BindSR(0, rContext->mRenderBuffers->MyGBuffer.BaseColor);
 
 	Quad::Render(gContext);
 	// TODO恢复默认FrameBuffer

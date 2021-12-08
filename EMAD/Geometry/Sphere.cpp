@@ -1,8 +1,9 @@
 #include "Sphere.h"
-#include "../Graphics/GPUDevice.h"
-#include "../Graphics/GPUContext.h"
-#include "../Graphics/Buffer/DynamicVertex.h"
-#include "../Graphics/Buffer/VertexBuffer.h"
+
+#include <Graphics/GPUDevice.h>
+#include <Graphics/GPUContext.h>
+#include <Graphics/Buffer/DynamicVertex.h>
+#include <Graphics/Buffer/VertexBuffer.h>
 
 #include <sstream>
 
@@ -23,7 +24,7 @@ std::shared_ptr<VertexBuffer> Sphere::GetVB(unsigned int stack, unsigned int sli
 	assert(stack >= 3);
 	assert(slice >= 3);
 	std::stringstream ss;
-	ss << "VB_Sphere" << stack << "/" << slice;
+	ss << "VB_Sphere:" << stack << "," << slice;
 	bool hasCreated = GPUDevice::Instance()->HasGPUResource(ss.str());
 	if (hasCreated) {
 		return GPUDevice::Instance()->Get<VertexBuffer>(ss.str());
@@ -88,5 +89,8 @@ std::shared_ptr<VertexBuffer> Sphere::GetVB(unsigned int stack, unsigned int sli
 		}
 	}
 
-	return GPUDevice::Instance()->CreateVertexBuffer(ss.str(), SphereVertexArray, indices);
+	VertexBuffer::ptr SphereVB = GPUDevice::Instance()->Create<VertexBuffer>(ss.str());
+	SphereVB->Update(SphereVertexArray, indices);
+
+	return SphereVB;
 }

@@ -10,8 +10,12 @@ class AssetTexture : public ShaderResource{
 public:
 	using ptr = std::shared_ptr<AssetTexture>;
 public:
-	AssetTexture(const std::string& fileName, GPUSampler::ptr sampler, bool isFlip, GPUDevice* device);
-	AssetTexture(std::vector<std::string>& fileNames, GPUSampler::ptr sampler, bool isFlip, GPUDevice* device);
+	AssetTexture(const std::string& name, GPUDevice* device);
+
+	// 从文件中加载用户资产纹理
+	void Update(const std::string& fileName, GPUSampler::ptr sampler, bool isFlip = false);
+	// 从文件中加载用户资产纹理
+	void Update(std::vector<std::string>& fileNames, GPUSampler::ptr sampler, bool isFlip = false);
 
 	static std::string GenResourceName(const std::vector<std::string>& fileNames);
 };

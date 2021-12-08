@@ -1,27 +1,34 @@
 #pragma once
 
-#include "../GPUResource.h"
 #include "DynamicVertex.h"
+
+#include <Graphics/GPUResource.h>
 
 // OpenGL中的VAO
 class VertexBuffer : public GPUResource {
 public:
 	using ptr = std::shared_ptr<VertexBuffer>;
 public:
-	// 无Index
-	VertexBuffer(const std::string& name, const VertexDataArray& vda, GPUDevice* device)
-		:GPUResource(name, ResourceType::VertexBuffer, device) 
+	VertexBuffer(const std::string& name, GPUDevice* device)
+		:GPUResource(name, ResourceType::VertexBuffer, device)
 		,mIndexSize(0){
 		glGenVertexArrays(1, &mResourceID);
+	}
+
+	~VertexBuffer() {
+		glDeleteVertexArrays(1, &mResourceID);
+	}
+
+	// 填充VAO
+	inline void Update(const VertexDataArray& vda) {
 		glBindVertexArray(mResourceID);
 		vda.BindVBO();
 		glBindVertexArray(0);
 	}
-	// 有Index
-	VertexBuffer(const std::string& name, const VertexDataArray& vda, const std::vector<unsigned int>& idv, GPUDevice* device)
-		:GPUResource(name, ResourceType::VertexBuffer, device) 
-		,mIndexSize(idv.size()){
-		glGenVertexArrays(1, &mResourceID);
+
+	inline void Update(const VertexDataArray& vda, const std::vector<unsigned int> idv) {
+		mIndexSize = idv.size();
+
 		glBindVertexArray(mResourceID);
 		vda.BindVBO();
 		// 绑定IndexBuffer

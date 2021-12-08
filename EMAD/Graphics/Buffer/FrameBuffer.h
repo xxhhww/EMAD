@@ -1,6 +1,6 @@
 #pragma once
-#include "../GPUResource.h"
-#include "../Texture/GPUTexture.h"
+#include <Graphics/GPUResource.h>
+#include <Graphics/Texture/GPUTexture.h>
 
 class FrameBuffer : public GPUResource {
 public:
@@ -9,6 +9,10 @@ public:
 	FrameBuffer(const std::string& name, GPUDevice* device)
 		:GPUResource(name, ResourceType::FrameBuffer, device) {
 		glGenFramebuffers(1, &mResourceID);
+	}
+
+	~FrameBuffer() {
+		glDeleteFramebuffers(1, &mResourceID);
 	}
 
 	// Ìí¼ÓÑÕÉ«¸½¼þ

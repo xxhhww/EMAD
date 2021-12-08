@@ -10,8 +10,6 @@ class GPUProgram;
 class RenderPassBase {
 public:
 	virtual void Init() = 0;
-protected:
-	std::shared_ptr<GPUProgram> mShaderProgram;
 };
 
 template<typename T>

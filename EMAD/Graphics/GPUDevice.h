@@ -1,8 +1,9 @@
 #pragma once
 
 #include "GPUResource.h"
-#include "../Core/Singleton.h"
-#include "../Core/NonCopyable.h"
+
+#include <Core/Singleton.h>
+#include <Core/NonCopyable.h>
 
 #include <map>
 #include <string>
@@ -40,25 +41,25 @@ public:
 		return std::dynamic_pointer_cast<T>(mResources[name]);
 	}
 
-	// Create Texture2D Which is Loaded From Users' file
-	std::shared_ptr<AssetTexture> CreateAssetTexture2D(const std::string& fileName, std::shared_ptr<GPUSampler> sampler, bool isFlip = false);
-	// Create CubeTexture Which is Loaded From Users' file
-	std::shared_ptr<AssetTexture> CreateAssetCubeTexture(std::vector<std::string>& fileNames, std::shared_ptr<GPUSampler> sampler, bool isFlip = false);
+	// 创建新资源
+	template<typename T>
+	std::shared_ptr<T> Create(const std::string& name) {
+		// 资源不存在
+		if (mResources.find(name) == mResources.end()) {
+			mResources.insert(
+				std::pair<std::string, std::shared_ptr<GPUResource>>(name, std::make_shared<T>(name, this))
+			);
+		}
+		return Get<T>(name);
+	}
 
-	// Create Texture Which is used as RenderTarget
-	std::shared_ptr<GPUTexture> CreateGPUTexture(const std::string& name, std::shared_ptr<GPUSampler> sampler, std::shared_ptr<GPUTexDesc> desc);
-	
-	// Create Shader Program
-	std::shared_ptr<GPUProgram> CreateGPUProgram(const std::string& name);
-
-	// Create Vertex Buffer Without Index
-	std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::string& name, const VertexDataArray& vda);
-	// Create Vertex Buffer With Index
-	std::shared_ptr<VertexBuffer> CreateVertexBuffer(const std::string& name, const VertexDataArray& vda, const std::vector<unsigned int>& idv);
-
-	std::shared_ptr<UniformBuffer> CreateUniformBuffer(const std::string& name, GLenum usage, size_t bufferSize);
-
-	std::shared_ptr<FrameBuffer> CreateFrameBuffer(const std::string& name);
+	// 释放资源
+	void Release(std::shared_ptr<GPUResource> resource) {
+		// 资源存在
+		if (mResources.find(resource->GetName()) != mResources.end()) {
+			mResources.erase(resource->GetName());
+		}
+	}
 
 private:
 	std::shared_ptr<GPUContext> mMainContext;

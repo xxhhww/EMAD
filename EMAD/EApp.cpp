@@ -6,6 +6,7 @@
 #include <Graphics/Texture/AssetTexture.h>
 #include <Graphics/Buffer/VertexBuffer.h>
 #include <Graphics/Buffer/FrameBuffer.h>
+#include <Graphics/Buffer/UniformBuffer.h>
 #include <Graphics/Shader/GPUProgram.h>
 #include <Graphics/Material/DeferredMaterial.h>
 #include <Geometry/Sphere.h>
@@ -97,12 +98,36 @@ void EApp::DebugDeferredRun()
 	DeferredMaterial::ptr SphereMaterial = std::make_shared<DeferredMaterial>();
 	SphereMaterial->Init();
 	// Bind AssetTexture to Material
-	GPUSampler::ptr sampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-	AssetTexture::ptr baseColorTex = GPUDevice::Instance()->CreateAssetTexture2D("iron/rustediron2_basecolor.png", sampler);
-	AssetTexture::ptr normalTex = GPUDevice::Instance()->CreateAssetTexture2D("iron/rustediron2_normal.png", sampler);
-	AssetTexture::ptr metallicTex = GPUDevice::Instance()->CreateAssetTexture2D("iron/rustediron2_metallic.png", sampler);
-	AssetTexture::ptr roughnessTex = GPUDevice::Instance()->CreateAssetTexture2D("iron/rustediron2_roughness.png", sampler);
-	AssetTexture::ptr aoTex = GPUDevice::Instance()->CreateAssetTexture2D("iron/rustediron2_ao.png", sampler);
+	AssetTexture::ptr baseColorTex;
+	AssetTexture::ptr normalTex;
+	AssetTexture::ptr metallicTex;
+	AssetTexture::ptr roughnessTex;
+	AssetTexture::ptr aoTex;
+	bool HasCreatedMaterial = GPUDevice::Instance()->HasGPUResource("IronBaseColor");
+	if (!HasCreatedMaterial) {
+		GPUSampler::ptr sampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+		baseColorTex = GPUDevice::Instance()->Create<AssetTexture>("IronBaseColor");
+		baseColorTex->Update("iron/rustediron2_basecolor.png", sampler);
+
+		normalTex = GPUDevice::Instance()->Create<AssetTexture>("IronNormal");
+		normalTex->Update("iron/rustediron2_normal.png", sampler);
+
+		metallicTex = GPUDevice::Instance()->Create<AssetTexture>("IronMetallic");
+		metallicTex->Update("iron/rustediron2_metallic.png", sampler);
+
+		roughnessTex = GPUDevice::Instance()->Create<AssetTexture>("IronRoughness");
+		roughnessTex->Update("iron/rustediron2_roughness.png", sampler);
+
+		aoTex = GPUDevice::Instance()->Create<AssetTexture>("IronAo");
+		aoTex->Update("iron/rustediron2_ao.png", sampler);
+	}
+	else {
+		baseColorTex = GPUDevice::Instance()->Get<AssetTexture>("IronBaseColor");
+		normalTex = GPUDevice::Instance()->Get<AssetTexture>("IronNormal");
+		metallicTex = GPUDevice::Instance()->Get<AssetTexture>("IronMetallic");
+		roughnessTex = GPUDevice::Instance()->Get<AssetTexture>("IronRoughness");
+		aoTex = GPUDevice::Instance()->Get<AssetTexture>("IronAo");
+	}
 
 	SphereMaterial->SetBaseColorTex(baseColorTex);
 	SphereMaterial->SetNormalTex(normalTex);
@@ -146,12 +171,18 @@ void EApp::DebugSphereRun()
 	unsigned int indexSize = SphereVertexBuffer->GetIndexSize();
 
 	// Create ShaderProgram
-	GPUProgram::ptr SphereProgram = GPUDevice::Instance()->CreateGPUProgram("Program_DebugSphere");
+	GPUProgram::ptr SphereProgram = GPUDevice::Instance()->Create<GPUProgram>("Program_DebugSphere");
 	SphereProgram->AttachShader(ShaderType::VS, "Debug/DebugSphere.vert");
 	SphereProgram->AttachShader(ShaderType::PS, "Debug/DebugSphere.frag");
 
 	// Create UniformBuffer
-	UniformBuffer::ptr SphereUniform = GPUDevice::Instance()->CreateUniformBuffer("UB_DebugSphere", GL_STATIC_DRAW, sizeof(DebugTrans));
+	UniformBuffer::ptr SphereUniform;
+	bool hasCreateUB = GPUDevice::Instance()->HasGPUResource("UB_DebugSphere");
+	if (!hasCreateUB) {
+		SphereUniform = GPUDevice::Instance()->Create<UniformBuffer>("UB_DebugSphere");
+		SphereUniform->AllocBuffer(sizeof(DebugTrans), GL_STATIC_DRAW);
+	}
+	SphereUniform = GPUDevice::Instance()->Get<UniformBuffer>("UB_DebugSphere");
 	DebugTrans debugTrans;
 
 	glm::mat4 modelTrans{ 1.0f };
@@ -167,8 +198,15 @@ void EApp::DebugSphereRun()
 	SphereUniform->FillBuffer(0, sizeof(DebugTrans), &debugTrans);
 
 	// Create AssetTexture
-	GPUSampler::ptr SphereTexSampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-	AssetTexture::ptr SphereAssetTex = GPUDevice::Instance()->CreateAssetTexture2D("earth2048.bmp", SphereTexSampler);
+	bool HasCreatedAssetTex = GPUDevice::Instance()->HasGPUResource("Earth");
+	AssetTexture::ptr SphereAssetTex;
+	if (!HasCreatedAssetTex) {
+		GPUSampler::ptr SphereTexSampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+		SphereAssetTex = GPUDevice::Instance()->Create<AssetTexture>("Earth");
+		SphereAssetTex->Update("earth2048.bmp", SphereTexSampler);
+	}
+	SphereAssetTex = GPUDevice::Instance()->Get<AssetTexture>("Earth");
+
 
 	// Bind Data
 	// Bind VB
@@ -185,12 +223,13 @@ void EApp::DebugQuadRun()
 	GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 
-	GPUProgram::ptr testProgram = GPUDevice::Instance()->CreateGPUProgram("Program_DebugQuad");
+	GPUProgram::ptr testProgram = GPUDevice::Instance()->Create<GPUProgram>("Program_DebugQuad");
 	testProgram->AttachShader(ShaderType::VS, "Debug/DebugQuad.vert");
 	testProgram->AttachShader(ShaderType::PS, "Debug/DebugQuad.frag");
 
 	GPUSampler::ptr tTexSampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-	AssetTexture::ptr testAssetTex = GPUDevice::Instance()->CreateAssetTexture2D("awesomeface.png", tTexSampler);
+	AssetTexture::ptr testAssetTex = GPUDevice::Instance()->Create<AssetTexture>("AwesomeFace");
+	testAssetTex->Update("awesomeface.png", tTexSampler);
 
 	GPUDevice::Instance()->GetContext()->BindProgram(testProgram);
 	GPUDevice::Instance()->GetContext()->BindSR(0, testAssetTex);
@@ -224,9 +263,10 @@ void EApp::DebugTriangleRun()
 	tVertexDataArray[2].Attr<AttrType::COLOR_RGB>() = { 0.0f, 0.0f, 1.0f };
 
 	// Create VAO Without Index
-	VertexBuffer::ptr tVertexBuffer = GPUDevice::Instance()->CreateVertexBuffer("testVAO", tVertexDataArray);
+	VertexBuffer::ptr tVertexBuffer = GPUDevice::Instance()->Create<VertexBuffer>("testVAO");
+	tVertexBuffer->Update(tVertexDataArray);
 	// Create Shader Program
-	GPUProgram::ptr tGPUProgram = GPUDevice::Instance()->CreateGPUProgram("testPrg");
+	GPUProgram::ptr tGPUProgram = GPUDevice::Instance()->Create<GPUProgram>("testPrg");
 	tGPUProgram->AttachShader(ShaderType::VS, "testTriangle_vs.vert");
 	tGPUProgram->AttachShader(ShaderType::PS, "testTriangle_fs.frag");
 
@@ -236,7 +276,8 @@ void EApp::DebugTriangleRun()
 		glm::mat4 viewTrans;
 		glm::mat4 projTrans;
 	};
-	UniformBuffer::ptr tUniformBuffer = GPUDevice::Instance()->CreateUniformBuffer("testUB", GL_STATIC_DRAW, sizeof(TestStruct));
+	UniformBuffer::ptr tUniformBuffer = GPUDevice::Instance()->Create<UniformBuffer>("testUB");
+	tUniformBuffer->AllocBuffer(sizeof(TestStruct), GL_STATIC_DRAW);
 	TestStruct testStruct;
 	testStruct.modelTrans = glm::identity<glm::mat4>();
 	testStruct.viewTrans = mCamera->getView();
@@ -245,7 +286,8 @@ void EApp::DebugTriangleRun()
 
 	// Create AssetTexture
 	GPUSampler::ptr tTexSampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-	AssetTexture::ptr tAssetTex = GPUDevice::Instance()->CreateAssetTexture2D("awesomeface.png", tTexSampler);
+	AssetTexture::ptr tAssetTex = GPUDevice::Instance()->Create<AssetTexture>("AwesomeFace");
+	tAssetTex->Update("awesomeface.png", tTexSampler);
 
 	// Bind Resources For Rendering
 	GPUDevice::Instance()->GetContext()->BindProgram(tGPUProgram);
@@ -261,13 +303,14 @@ void EApp::DebugFrameBufferRun()
 	int srcWidth = GWin::Instance()->getRectangle().first;
 	int srcHeight = GWin::Instance()->getRectangle().second;
 
-	FrameBuffer::ptr testFrameBuffer = GPUDevice::Instance()->CreateFrameBuffer("FB_DebugFB");
+	FrameBuffer::ptr testFrameBuffer = GPUDevice::Instance()->Create<FrameBuffer>("FB_DebugFB");
 
 	// Create Color Attachment
 	GPUSampler::ptr sampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_NEAREST, GL_NEAREST);
 
 	GPUTexDesc::ptr RGBTexDesc = GPUTexDesc::Gen2D(0, GL_RGB, srcWidth, srcHeight, GL_RGB, GL_FLOAT);
-	GPUTexture::ptr testGPUTexture = GPUDevice::Instance()->CreateGPUTexture("GT_DebugFB", sampler, RGBTexDesc);
+	GPUTexture::ptr testGPUTexture = GPUDevice::Instance()->Create<GPUTexture>("GT_DebugFB");
+	testGPUTexture->Update(sampler, RGBTexDesc);
 
 	// Add Attachment
 	testFrameBuffer->Activate();
@@ -287,7 +330,7 @@ void EApp::DebugFrameBufferRun()
 	
 
 	// Create FB GPUProgram
-	GPUProgram::ptr testFBGPUProgram = GPUDevice::Instance()->CreateGPUProgram("Program_DebugFB");
+	GPUProgram::ptr testFBGPUProgram = GPUDevice::Instance()->Create<GPUProgram>("Program_DebugFB");
 	testFBGPUProgram->AttachShader(ShaderType::VS, "Debug/DebugFrameBuffer.vert");
 	testFBGPUProgram->AttachShader(ShaderType::PS, "Debug/DebugFrameBuffer.frag");
 
@@ -295,7 +338,8 @@ void EApp::DebugFrameBufferRun()
 	VertexBuffer::ptr SphereVB = Sphere::GetVB();
 
 	// Create UB
-	UniformBuffer::ptr testUniformBuffer = GPUDevice::Instance()->CreateUniformBuffer("UB_DebugFB", GL_STATIC_DRAW, sizeof(DebugTrans));
+	UniformBuffer::ptr testUniformBuffer = GPUDevice::Instance()->Create<UniformBuffer>("UB_DebugFB");
+	testUniformBuffer->AllocBuffer(sizeof(DebugTrans), GL_STATIC_DRAW);
 	DebugTrans debugTrans;
 	debugTrans.modelTrans = glm::identity<glm::mat4>();
 	debugTrans.viewTrans = mCamera->getView();
@@ -317,13 +361,14 @@ void EApp::DebugFrameBufferRun()
 	// Draw Attachment to Quad
 
 	// Create Quad Program
-	GPUProgram::ptr testQuadProgram = GPUDevice::Instance()->CreateGPUProgram("Program_DebugFB_Quad");
+	GPUProgram::ptr testQuadProgram = GPUDevice::Instance()->Create<GPUProgram>("Program_DebugFB_Quad");
 	testQuadProgram->AttachShader(ShaderType::VS, "Debug/DebugQuad.vert");
 	testQuadProgram->AttachShader(ShaderType::PS, "Debug/DebugQuad.frag");
 
 	
 	GPUSampler::ptr tTexSampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-	AssetTexture::ptr testAssetTex = GPUDevice::Instance()->CreateAssetTexture2D("awesomeface.png", tTexSampler);
+	AssetTexture::ptr testAssetTex = GPUDevice::Instance()->Create<AssetTexture>("AwesomeFace");
+	testAssetTex->Update("awesomeface.png", tTexSampler);
 
 	context->BindFB(nullptr);
 	context->BindProgram(testQuadProgram);

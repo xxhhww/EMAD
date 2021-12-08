@@ -1,23 +1,35 @@
 #include "LightPass.h"
 
-#include "../../Graphics/GPUDevice.h"
-#include "../../Graphics/GPUContext.h"
-#include "../../Graphics/Shader/GPUProgram.h"
-#include "../../Graphics/Texture/ShaderResource.h"
-#include "../../Graphics/Texture/GPUTexture.h"
+#include <Graphics/GPUDevice.h>
+#include <Graphics/GPUContext.h>
+#include <Graphics/Shader/GPUProgram.h>
+#include <Graphics/Texture/ShaderResource.h>
+#include <Graphics/Texture/GPUTexture.h>
+#include <Graphics/Buffer/UniformBuffer.h>
+#include <Render/RenderContext.h>
+#include <Render/RenderView.h>
+#include <Render/RenderBuffers.h>
+#include <Geometry/Quad.h>
 
-#include "../RenderContext.h"
-#include "../RenderView.h"
-#include "../RenderBuffers.h"
+struct TestShaderData {
+	glm::vec4 viewPos;
+	glm::vec4 lightColor;
+	glm::vec4 lightPos;
+};
 
-#include "../../Geometry/Quad.h"
 
-void LightPass::Init()
-{
+LightPass::~LightPass(){
+	GPUDevice::Instance()->Release(mShaderProgram);
+}
+
+void LightPass::Init(){
 	// 从"Shader/"中读取LightPass需要使用的着色器
-	mShaderProgram = GPUDevice::Instance()->CreateGPUProgram("Program_LightPass");
+	mShaderProgram = GPUDevice::Instance()->Create<GPUProgram>("Program_LightPass");
 	mShaderProgram->AttachShader(ShaderType::VS, "LightPass/LightPass.vert");
 	mShaderProgram->AttachShader(ShaderType::PS, "LightPass/LightPass.frag");
+
+	UniformBuffer::ptr ShaderDataUB = GPUDevice::Instance()->Create<UniformBuffer>("UB_LightPass");
+	ShaderDataUB->AllocBuffer(sizeof(TestShaderData), GL_STATIC_DRAW);
 }
 
 void LightPass::Render(std::shared_ptr<RenderContext> rContext)
@@ -31,19 +43,14 @@ void LightPass::Render(std::shared_ptr<RenderContext> rContext)
 	gContext->BindSR(3, rContext->mRenderBuffers->MyGBuffer.Other);
 
 	// Bind UB
-	struct TestShaderData {
-		glm::vec4 viewPos;
-		glm::vec4 lightColor;
-		glm::vec4 lightPos;
-	};
-	UniformBuffer::ptr ShaderDataUB = GPUDevice::Instance()->CreateUniformBuffer("UB_LightPass", GL_STATIC_DRAW, sizeof(TestShaderData));
 	TestShaderData tempShaderData;
 	tempShaderData.viewPos = glm::vec4(rContext->mRenderView->MyViewPos, 1.0f);
 	tempShaderData.lightColor = glm::vec4{ 150.0f, 150.0f, 150.0f, 0.0f };
 	tempShaderData.lightPos = glm::vec4{ 0.0f, 0.0f, 10.0f, 0.0f };
-	ShaderDataUB->FillBuffer(0, sizeof(TestShaderData), &tempShaderData);
+	UniformBuffer::ptr tempShaderDataUB = GPUDevice::Instance()->Get<UniformBuffer>("UB_LightPass");
+	tempShaderDataUB->FillBuffer(0, sizeof(TestShaderData), &tempShaderData);
 
-	gContext->BindUB(0, ShaderDataUB);
+	gContext->BindUB(0, tempShaderDataUB);
 
 	// 设置LightPass对应的着色器
 	gContext->BindProgram(mShaderProgram);

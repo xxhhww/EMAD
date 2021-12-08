@@ -1,12 +1,12 @@
 #include "Quad.h"
-#include "../Graphics/GPUDevice.h"
-#include "../Graphics/GPUContext.h"
-#include "../Graphics/Buffer/DynamicVertex.h"
-#include "../Graphics/Buffer/VertexBuffer.h"
+#include <Graphics/GPUDevice.h>
+#include <Graphics/GPUContext.h>
+#include <Graphics/Buffer/DynamicVertex.h>
+#include <Graphics/Buffer/VertexBuffer.h>
 
 void Quad::Render(std::shared_ptr<GPUContext> context)
 {
-	// BindVB
+	// BindVAO
 	context->BindVAO(Quad::GetVB());
 	// DrawArrays
 	context->DrawArrays(GL_TRIANGLES, 0, 6);
@@ -37,5 +37,8 @@ std::shared_ptr<VertexBuffer> Quad::GetVB()
 	QuadVertexArray[4].Attr<AttrType::TEXCOORD_2D>() = { 1.0f, 0.0f };
 	QuadVertexArray[5].Attr<AttrType::TEXCOORD_2D>() = { 1.0f, 1.0f };
 
-	return GPUDevice::Instance()->CreateVertexBuffer("VB_Quad", QuadVertexArray);
+	VertexBuffer::ptr QuadVB = GPUDevice::Instance()->Create<VertexBuffer>("VB_Quad");
+	QuadVB->Update(QuadVertexArray);
+
+	return QuadVB;
 }
