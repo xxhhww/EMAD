@@ -149,7 +149,7 @@ void EApp::DebugDeferredRun()
 	tempDrawCall->MyScaling = glm::vec3{ 1.0f, 1.0f, 1.0f };
 
 	// Add Draw Call To RenderContex
-	tempRenderContext->mRenderList->AddDrawCall(DrawCallPass::GBuffer, tempDrawCall);
+	tempRenderContext->AddDrawCall(DrawCallPass::GBuffer, tempDrawCall);
 
 	// Render GBuffer Pass
 	GBufferPass::Instance()->Render(tempRenderContext);

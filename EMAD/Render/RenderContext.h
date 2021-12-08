@@ -1,11 +1,12 @@
 #pragma once
 
 #include "DrawCall.h"
+#include "RenderList.h"
+
 #include <memory>
 
 class RenderBuffers;
 class RenderView;
-class RenderList;
 class GPUContext;
 
 // 渲染上下文，记录渲染所需的信息
@@ -15,9 +16,6 @@ public:
 public:
 	// 初始化函数
 	RenderContext();
-
-	// 收集各个Object发出的DrawCall
-	void AddDrawCall(DrawCallPass pass, DrawCall::ptr drawCall);
 
 	// 设置当前的Context
 	inline void SetGPUContext(std::shared_ptr<GPUContext> gContext) {
@@ -29,8 +27,20 @@ public:
 		mRenderView = renderView;
 	}
 
+	// 收集各个Object发出的DrawCall
+	inline void AddDrawCall(DrawCallPass pass, DrawCall::ptr drawCall) {
+		// TODO 判断pass是否存在
+		mRenderList->AddDrawCall(pass, drawCall);
+	}
+
 	// 执行pass对应的DrawCall
-	void ExecDrawCall(DrawCallPass pass);
+	inline void ExecDrawCall(DrawCallPass pass) {
+		mRenderList->ExecDrawCall(shared_from_this(), pass);
+	}
+
+	inline void ClearDrawCall() {
+		mRenderList->ClearDrawCall();
+	}
 
 public:
 	std::shared_ptr<GPUContext> mGPUContext;

@@ -22,6 +22,10 @@ public:
 	// 执行DrawCall需要很多一些渲染信息，比如摄像机View信息，而这些信息存放在RenderContex中，因此需要一个指向它的指针
 	void ExecDrawCall(std::shared_ptr<RenderContext> renderContext, DrawCallPass pass);
 
+	inline void ClearDrawCall() {
+		mDrawCalls.clear();
+	}
+
 private:
 	// 目前不分Batch
 	std::map<DrawCallPass, std::vector<DrawCall::ptr>> mDrawCalls;

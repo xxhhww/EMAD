@@ -20,7 +20,7 @@ RenderBuffers::RenderBuffers(){
 	MyGBuffer.Position->Update(sampler, RGB16FTexDesc);
 
 	MyGBuffer.Normal = GPUDevice::Instance()->Create<GPUTexture>("GT_GBufferNormal");
-	MyGBuffer.Normal->Update(sampler, RGBTexDesc);
+	MyGBuffer.Normal->Update(sampler, RGB16FTexDesc);
 
 	MyGBuffer.Other = GPUDevice::Instance()->Create<GPUTexture>("GT_GBufferOther");
 	MyGBuffer.Other->Update(sampler, RGBTexDesc);
@@ -49,12 +49,14 @@ void RenderBuffers::Update(unsigned int Width, unsigned int Height)
 		GPUTexDesc::ptr RGBTexDesc = MyGBuffer.BaseColor->GetTexDesc();
 		GPUTexDesc::ptr RGB16FTexDesc = MyGBuffer.Position->GetTexDesc();
 		RGBTexDesc->Width = Width;
+		RGBTexDesc->Height = Height;
+		RGB16FTexDesc->Width = Width;
 		RGB16FTexDesc->Height = Height;
 
 		// ¸üÐÂ
 		MyGBuffer.BaseColor->Update(sampler, RGBTexDesc);
 		MyGBuffer.Position->Update(sampler, RGB16FTexDesc);
-		MyGBuffer.Normal->Update(sampler, RGBTexDesc);
+		MyGBuffer.Normal->Update(sampler, RGB16FTexDesc);
 		MyGBuffer.Other->Update(sampler, RGBTexDesc);
 
 		MyWidth = Width;
