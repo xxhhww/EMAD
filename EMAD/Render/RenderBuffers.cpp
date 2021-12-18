@@ -11,6 +11,7 @@ RenderBuffers::RenderBuffers(){
 
 	GPUTexDesc::ptr RGBTexDesc = GPUTexDesc::Gen2D(0, GL_RGB, srcWidth, srcHeight, GL_RGB, GL_FLOAT);
 	GPUTexDesc::ptr RGB16FTexDesc = GPUTexDesc::Gen2D(0, GL_RGB16F, srcWidth, srcHeight, GL_RGB, GL_FLOAT);
+	GPUTexDesc::ptr DepthTexDesc = GPUTexDesc::Gen2D(0, GL_DEPTH_COMPONENT, srcWidth, srcHeight, GL_DEPTH_COMPONENT, GL_FLOAT);
 
 	// 创建并描述资源
 	MyGBuffer.BaseColor = GPUDevice::Instance()->Create<GPUTexture>("GT_GBufferColor");
@@ -28,6 +29,10 @@ RenderBuffers::RenderBuffers(){
 	// 记录屏幕宽高
 	MyWidth = srcWidth;
 	MyHeight = srcHeight;
+
+	// 创建深度纹理缓存
+	DepthBuffer = GPUDevice::Instance()->Create<GPUTexture>("GT_DepthBuffer");
+	DepthBuffer->Update(sampler, DepthTexDesc);
 }
 
 RenderBuffers::~RenderBuffers()

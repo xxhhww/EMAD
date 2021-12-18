@@ -1,20 +1,28 @@
 #version 450 core
 // LightPass.frag的计算处于世界坐标之下
+out vec4 FragColor;
 
 in VSOut{
 	vec3 fPosition;
 	vec2 fTexcoord;
 } fsin;
 
-layout(std140, binding = 0) uniform ShaderData{
-    vec4 viewPos;
-    vec4 LightColor;
-	vec4 LightPos;
+// Uniform
+const float PI = 3.14159265359;
+
+const uint MAX_POINTLIGHT_SIZE = 6u;
+
+struct PointLightData{
+    vec4 lightColor;
+    vec3 lightPos;
+    float intensity;
 };
 
-out vec4 FragColor;
-
-const float PI = 3.14159265359;
+layout(std430, binding = 0) buffer LightData1{
+    vec3 viewPos;
+    int pointLightNums;
+    PointLightData pointLightDatas[];
+};
 
 layout (binding = 0) uniform sampler2D BaseColor;
 layout (binding = 1) uniform sampler2D Position;
@@ -46,18 +54,22 @@ void main(){
 
     // reflectance equation
     vec3 Lo = vec3(0.0);
-    for(int i = 0; i < 1; ++i) 
+    for(int i = 0; i < pointLightNums; ++i) 
     {
         // calculate per-light radiance
+        vec3 LightPos = pointLightDatas[i].lightPos;
+        vec3 LightColor = vec3(pointLightDatas[i].lightColor) * (pointLightDatas[i].intensity);
+
         vec3 L = normalize(vec3(LightPos) - worldPos);
         vec3 H = normalize(V + L);
         float distance    = length(vec3(LightPos) - worldPos);
         float attenuation = 1.0f / (distance * distance);
-        vec3 radiance     = vec3(LightColor) * attenuation;        
+        vec3 radiance     = LightColor * attenuation;        
 
         // cook-torrance brdf
         float NDF = DistributionGGX(N, H, roughness);        
-        float G   = GeometrySmith(N, V, L, roughness);      
+        float G   = GeometrySmith(N, V, L, roughness);
+        //vec3 F    = fresnelSchlick(max(dot(N, V), 0.0f), F0); 
         vec3 F    = fresnelSchlick(max(dot(H, V), 0.0f), F0);       
 
         vec3 kS = F;
@@ -85,7 +97,7 @@ void main(){
 vec3 fresnelSchlick(float cosTheta, vec3 F0)
 {
     return F0 + (1.0 - F0) * pow(clamp(1.0 - cosTheta, 0.0, 1.0), 5.0);
-}  
+}
 
 float DistributionGGX(vec3 N, vec3 H, float roughness)
 {

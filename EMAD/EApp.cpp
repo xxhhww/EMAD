@@ -20,29 +20,41 @@
 #include <Render/RenderContext.h>
 #include <Render/Pass/GBufferPass.h>
 #include <Render/Pass/LightPass.h>
+#include <Render/Pass/ForwardPass.h>
+#include <Actor/Light/PointLight.h>
+
+#include <Scene/Scene.h>
 
 #include <iostream>
+
+std::shared_ptr<PointLight> GlobLight;
 
 EApp::EApp(int width, int height, const std::string& name){
 
 	// 初始化渲染窗口
 	GWin::Instance()->Init(width, height, name);
+	GPUDevice::Instance();
 	// 初始化渲染服务
-	RenderService::Instance()->Init();
+	//RenderService::Instance()->Init();
 
 	// 初始化摄像机
 	mCamera = std::make_shared<Camera>();
 
 	// 启动深度缓冲测试
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 	// 启动模板测试
-	glEnable(GL_STENCIL_TEST);
+	//glEnable(GL_STENCIL_TEST);
+
+	//GlobLight = std::make_shared<PointLight>();
+	//GlobLight->SetPosition(0.0f, 0.0f, 3.0f);
 }
 
 int EApp::Run()
 {
 	float deltaTime = 0.0f; // 当前帧与上一帧的时间差
 	float lastFrame = 0.0f; // 上一帧的时间
+
+	//Scene::Instance()->Init();
 
 	while (!glfwWindowShouldClose(GWin::Instance()->window()))
 	{
@@ -54,11 +66,17 @@ int EApp::Run()
 		lastFrame = currentFrame;
 		this->HandleInput(deltaTime);
 		
-		//GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		//GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		// Render Scene
+		//Scene::Instance()->Render(mCamera);
+
+		// GenCtrlGui
+		//Scene::Instance()->GenCtrlGui();
+
+		GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT);
+		GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		//DebugTriangleRun();
 		//DebugSphereRun();
-		DebugDeferredRun();
+		//DebugDeferredRun();
 		//DebugQuadRun();
 		//DebugFrameBufferRun();
 
@@ -76,11 +94,19 @@ struct DebugTrans {
 	glm::mat4 projTrans;
 };
 
+void EApp::DebugSceneRun()
+{
+
+}
+
 void EApp::DebugDeferredRun()
 {
 	// 当前帧的渲染上下文
 	RenderContext::ptr tempRenderContext = std::make_shared<RenderContext>();
 	tempRenderContext->SetGPUContext(GPUDevice::Instance()->GetContext());
+
+	// Add PointLight
+	GlobLight->Submit(tempRenderContext);
 
 	// Create RenderView
 	RenderView::ptr tempRenderView = std::make_shared<RenderView>();
@@ -95,45 +121,35 @@ void EApp::DebugDeferredRun()
 	unsigned int IndexSize = SphereVB->GetIndexSize();
 
 	// Create Deferred Material
-	DeferredMaterial::ptr SphereMaterial = std::make_shared<DeferredMaterial>();
-	SphereMaterial->Init();
-	// Bind AssetTexture to Material
-	AssetTexture::ptr baseColorTex;
-	AssetTexture::ptr normalTex;
-	AssetTexture::ptr metallicTex;
-	AssetTexture::ptr roughnessTex;
-	AssetTexture::ptr aoTex;
-	bool HasCreatedMaterial = GPUDevice::Instance()->HasGPUResource("IronBaseColor");
-	if (!HasCreatedMaterial) {
+	static DeferredMaterial::ptr IronMaterial = std::make_shared<DeferredMaterial>();
+	static bool HasCteatedMaterial = false;
+	if (!HasCteatedMaterial) {
+		IronMaterial->Init();
+
 		GPUSampler::ptr sampler = GPUSampler::Gen2D(GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
-		baseColorTex = GPUDevice::Instance()->Create<AssetTexture>("IronBaseColor");
+		AssetTexture::ptr baseColorTex = GPUDevice::Instance()->Create<AssetTexture>("IronBaseColor");
 		baseColorTex->Update("iron/rustediron2_basecolor.png", sampler);
 
-		normalTex = GPUDevice::Instance()->Create<AssetTexture>("IronNormal");
+		AssetTexture::ptr normalTex = GPUDevice::Instance()->Create<AssetTexture>("IronNormal");
 		normalTex->Update("iron/rustediron2_normal.png", sampler);
 
-		metallicTex = GPUDevice::Instance()->Create<AssetTexture>("IronMetallic");
+		AssetTexture::ptr metallicTex = GPUDevice::Instance()->Create<AssetTexture>("IronMetallic");
 		metallicTex->Update("iron/rustediron2_metallic.png", sampler);
 
-		roughnessTex = GPUDevice::Instance()->Create<AssetTexture>("IronRoughness");
+		AssetTexture::ptr roughnessTex = GPUDevice::Instance()->Create<AssetTexture>("IronRoughness");
 		roughnessTex->Update("iron/rustediron2_roughness.png", sampler);
 
-		aoTex = GPUDevice::Instance()->Create<AssetTexture>("IronAo");
+		AssetTexture::ptr aoTex = GPUDevice::Instance()->Create<AssetTexture>("IronAo");
 		aoTex->Update("iron/rustediron2_ao.png", sampler);
-	}
-	else {
-		baseColorTex = GPUDevice::Instance()->Get<AssetTexture>("IronBaseColor");
-		normalTex = GPUDevice::Instance()->Get<AssetTexture>("IronNormal");
-		metallicTex = GPUDevice::Instance()->Get<AssetTexture>("IronMetallic");
-		roughnessTex = GPUDevice::Instance()->Get<AssetTexture>("IronRoughness");
-		aoTex = GPUDevice::Instance()->Get<AssetTexture>("IronAo");
-	}
 
-	SphereMaterial->SetBaseColorTex(baseColorTex);
-	SphereMaterial->SetNormalTex(normalTex);
-	SphereMaterial->SetMetallicTex(metallicTex);
-	SphereMaterial->SetRoughnessTex(roughnessTex);
-	SphereMaterial->SetAoTex(aoTex);
+		IronMaterial->SetBaseColorTex(baseColorTex);
+		IronMaterial->SetNormalTex(normalTex);
+		IronMaterial->SetMetallicTex(metallicTex);
+		IronMaterial->SetRoughnessTex(roughnessTex);
+		IronMaterial->SetAoTex(aoTex);
+
+		HasCteatedMaterial = true;
+	}
 
 	// Create DrawCall
 	DrawCall::ptr tempDrawCall = std::make_shared<DrawCall>();
@@ -142,7 +158,7 @@ void EApp::DebugDeferredRun()
 	tempDrawCall->MyGeometryData.IndexSize = IndexSize;
 	tempDrawCall->MyGeometryData.VertexBufferPtr = SphereVB;
 	
-	tempDrawCall->MyMaterial = SphereMaterial;
+	tempDrawCall->MyMaterial = IronMaterial;
 
 	tempDrawCall->MyModelTrans = glm::identity<glm::mat4>();
 	tempDrawCall->MyWorldPosition = glm::vec3{ 0.0f, 0.0f, 0.0f };
@@ -156,6 +172,8 @@ void EApp::DebugDeferredRun()
 
 	// Render Light Pass
 	LightPass::Instance()->Render(tempRenderContext);
+
+	ForwardPass::Instance()->Render(tempRenderContext);
 }
 
 void EApp::DebugSphereRun()
@@ -212,7 +230,7 @@ void EApp::DebugSphereRun()
 	// Bind VB
 	GPUContext::ptr context = GPUDevice::Instance()->GetContext();
 	context->BindProgram(SphereProgram);
-	context->BindUB(0, SphereUniform);
+	context->BindSB(0, SphereUniform);
 	context->BindSR(0, SphereAssetTex);
 	context->BindVAO(SphereVertexBuffer);
 	context->DrawElements(GL_TRIANGLES, indexSize, 0u);
@@ -291,7 +309,7 @@ void EApp::DebugTriangleRun()
 
 	// Bind Resources For Rendering
 	GPUDevice::Instance()->GetContext()->BindProgram(tGPUProgram);
-	GPUDevice::Instance()->GetContext()->BindUB(0, tUniformBuffer);
+	GPUDevice::Instance()->GetContext()->BindSB(0, tUniformBuffer);
 	GPUDevice::Instance()->GetContext()->BindSR(0, tAssetTex);
 	GPUDevice::Instance()->GetContext()->BindVAO(tVertexBuffer);
 
@@ -352,7 +370,7 @@ void EApp::DebugFrameBufferRun()
 	
 	context->BindFB(testFrameBuffer);
 	context->BindProgram(testFBGPUProgram);
-	context->BindUB(0, testUniformBuffer);
+	context->BindSB(0, testUniformBuffer);
 	context->BindVAO(SphereVB);
 	context->DrawElements(GL_TRIANGLES, SphereVB->GetIndexSize(), 0u);
 	

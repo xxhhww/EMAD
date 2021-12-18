@@ -25,4 +25,7 @@ struct RenderBuffers {
 	unsigned int MyWidth; // 场景纹理的宽度
 	unsigned int MyHeight; // 场景纹理的高度 
 	// Other Buffers
+
+	// Depth Buffers
+	std::shared_ptr<GPUTexture> DepthBuffer;
 };

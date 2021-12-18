@@ -5,18 +5,11 @@
 #include <Graphics/Shader/GPUProgram.h>
 #include <Graphics/Texture/ShaderResource.h>
 #include <Graphics/Texture/GPUTexture.h>
-#include <Graphics/Buffer/UniformBuffer.h>
+#include <Graphics/Buffer/StorageBuffer.h>
 #include <Render/RenderContext.h>
 #include <Render/RenderView.h>
 #include <Render/RenderBuffers.h>
 #include <Geometry/Quad.h>
-
-struct TestShaderData {
-	glm::vec4 viewPos;
-	glm::vec4 lightColor;
-	glm::vec4 lightPos;
-};
-
 
 LightPass::~LightPass(){
 	GPUDevice::Instance()->Release(mShaderProgram);
@@ -28,8 +21,8 @@ void LightPass::Init(){
 	mShaderProgram->AttachShader(ShaderType::VS, "LightPass/LightPass.vert");
 	mShaderProgram->AttachShader(ShaderType::PS, "LightPass/LightPass.frag");
 
-	UniformBuffer::ptr ShaderDataUB = GPUDevice::Instance()->Create<UniformBuffer>("UB_LightPass");
-	ShaderDataUB->AllocBuffer(sizeof(TestShaderData), GL_STATIC_DRAW);
+	//UniformBuffer::ptr ShaderDataUB = GPUDevice::Instance()->Create<UniformBuffer>("UB_LightPass");
+	//ShaderDataUB->AllocBuffer(sizeof(TestShaderData), GL_STATIC_DRAW);
 }
 
 void LightPass::Render(std::shared_ptr<RenderContext> rContext)
@@ -42,19 +35,20 @@ void LightPass::Render(std::shared_ptr<RenderContext> rContext)
 	gContext->BindSR(2, rContext->mRenderBuffers->MyGBuffer.Normal);
 	gContext->BindSR(3, rContext->mRenderBuffers->MyGBuffer.Other);
 
-	// Bind UB
-	TestShaderData tempShaderData;
-	tempShaderData.viewPos = glm::vec4(rContext->mRenderView->MyViewPos, 1.0f);
-	tempShaderData.lightColor = glm::vec4{ 150.0f, 150.0f, 150.0f, 0.0f };
-	tempShaderData.lightPos = glm::vec4{ 0.0f, 0.0f, 10.0f, 0.0f };
-	UniformBuffer::ptr tempShaderDataUB = GPUDevice::Instance()->Get<UniformBuffer>("UB_LightPass");
-	tempShaderDataUB->FillBuffer(0, sizeof(TestShaderData), &tempShaderData);
+	// Bind UB(for pointLights)
+	StorageBuffer::ptr tempPointLightSB = GPUDevice::Instance()->Create<StorageBuffer>("SB_LightPass_PL");
+	int size = rContext->mRenderList->mPointLights.size();
+	tempPointLightSB->AllocBuffer(sizeof(glm::vec3) + sizeof(int) + size * sizeof(PointLightData), GL_STATIC_DRAW);
+	tempPointLightSB->FillBuffer(0, sizeof(glm::vec3), &rContext->mRenderView->MyViewPos);
+	tempPointLightSB->FillBuffer(sizeof(glm::vec3), sizeof(int), &size);
+	tempPointLightSB->FillBuffer(sizeof(glm::vec3) + sizeof(int), size * sizeof(PointLightData), rContext->mRenderList->mPointLights.data());
 
-	gContext->BindUB(0, tempShaderDataUB);
+	gContext->BindSB(0, tempPointLightSB);
 
 	// 设置LightPass对应的着色器
 	gContext->BindProgram(mShaderProgram);
-
+	// 
+	gContext->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// Draw
 	Quad::Render(rContext->mGPUContext);
 }

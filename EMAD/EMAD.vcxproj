@@ -155,6 +155,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Actor\Actor.cpp" />
+    <ClCompile Include="Actor\Light\Light.cpp" />
+    <ClCompile Include="Actor\Light\PointLight.cpp" />
+    <ClCompile Include="Actor\Solid\Ball.cpp" />
     <ClCompile Include="EApp.cpp" />
     <ClCompile Include="EMain.cpp" />
     <ClCompile Include="Exception.cpp" />
@@ -190,12 +194,10 @@
     <ClCompile Include="Object\Drawable\TestCube2.cpp" />
     <ClCompile Include="Object\Drawable\TestPlane.cpp" />
     <ClCompile Include="Object\Drawable\TestQuad.cpp" />
-    <ClCompile Include="Object\Light\DirectLight.cpp" />
-    <ClCompile Include="Object\Light\PointLight.cpp" />
     <ClCompile Include="Program\Program.cpp" />
     <ClCompile Include="Program\Shader.cpp" />
-    <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Render\MainRender.cpp" />
+    <ClCompile Include="Render\Pass\ForwardPass.cpp" />
     <ClCompile Include="Render\Pass\GBufferPass.cpp" />
     <ClCompile Include="Render\Pass\LightPass.cpp" />
     <ClCompile Include="Render\Pass\RenderPass.cpp" />
@@ -203,10 +205,15 @@
     <ClCompile Include="Render\RenderContext.cpp" />
     <ClCompile Include="Render\RenderList.cpp" />
     <ClCompile Include="Render\RenderView.cpp" />
+    <ClCompile Include="Scene\Scene.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Surface\Surface.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Actor\Actor.h" />
+    <ClInclude Include="Actor\Light\Light.h" />
+    <ClInclude Include="Actor\Light\PointLight.h" />
+    <ClInclude Include="Actor\Solid\Ball.h" />
     <ClInclude Include="Core\NonCopyable.h" />
     <ClInclude Include="Core\Singleton.h" />
     <ClInclude Include="EApp.h" />
@@ -217,6 +224,8 @@
     <ClInclude Include="Geometry\Sphere.h" />
     <ClInclude Include="Graphics\Buffer\DynamicVertex.h" />
     <ClInclude Include="Graphics\Buffer\FrameBuffer.h" />
+    <ClInclude Include="Graphics\Buffer\ShaderBuffer.h" />
+    <ClInclude Include="Graphics\Buffer\StorageBuffer.h" />
     <ClInclude Include="Graphics\Buffer\UniformBuffer.h" />
     <ClInclude Include="Graphics\Buffer\VertexBuffer.h" />
     <ClInclude Include="Graphics\GPUContext.h" />
@@ -225,6 +234,7 @@
     <ClInclude Include="Graphics\GPUResource.h" />
     <ClInclude Include="Graphics\Material\DeferredMaterial.h" />
     <ClInclude Include="Graphics\Material\Material.h" />
+    <ClInclude Include="Graphics\Material\MaterialShader.h" />
     <ClInclude Include="Graphics\Shader\GPUProgram.h" />
     <ClInclude Include="Graphics\Shader\GPUShader.h" />
     <ClInclude Include="Graphics\Texture\AssetTexture.h" />
@@ -250,14 +260,11 @@
     <ClInclude Include="Object\Drawable\TestPlane.h" />
     <ClInclude Include="Object\Drawable\TestQuad.h" />
     <ClInclude Include="Object\EObject.h" />
-    <ClInclude Include="Object\Geometry\Sphere.h" />
-    <ClInclude Include="Object\Light\DirectLight.h" />
-    <ClInclude Include="Object\Light\PointLight.h" />
     <ClInclude Include="Program\Program.h" />
     <ClInclude Include="Program\Shader.h" />
-    <ClInclude Include="Renderer.h" />
     <ClInclude Include="Render\DrawCall.h" />
     <ClInclude Include="Render\MainRender.h" />
+    <ClInclude Include="Render\Pass\ForwardPass.h" />
     <ClInclude Include="Render\Pass\GBufferPass.h" />
     <ClInclude Include="Render\Pass\LightPass.h" />
     <ClInclude Include="Render\Pass\RenderPass.h" />
@@ -265,6 +272,7 @@
     <ClInclude Include="Render\RenderContext.h" />
     <ClInclude Include="Render\RenderList.h" />
     <ClInclude Include="Render\RenderView.h" />
+    <ClInclude Include="Scene\Scene.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Surface\Surface.h" />
   </ItemGroup>
@@ -294,6 +302,8 @@
     <None Include="Shader\LightShader_vs.vert" />
     <None Include="Shader\Material\ForwardMaterial.frag" />
     <None Include="Shader\Material\ForwardMaterial.vert" />
+    <None Include="Shader\Material\SolidSphere.frag" />
+    <None Include="Shader\Material\SolidSphere.vert" />
     <None Include="Shader\normalMap_fs.frag" />
     <None Include="Shader\normalMap_vs.vert" />
     <None Include="Shader\NormalVisual_fs.frag" />

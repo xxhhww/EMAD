@@ -62,3 +62,4 @@ void PointLight::draw(std::shared_ptr<Program> program) noexcept
 	glBindVertexArray(mVAO);
 	glDrawElements(GL_TRIANGLES, mIndexSize, GL_UNSIGNED_INT, 0);
 }
+

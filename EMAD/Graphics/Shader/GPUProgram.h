@@ -3,6 +3,8 @@
 
 #include <Graphics/GPUResource.h>
 
+#include <glm/glm.hpp>
+
 #include <vector>
 #include <map>
 
@@ -34,6 +36,28 @@ public:
 			if (i->GetShaderType() == sType)
 				return i;
 		}
+	}
+
+	// 设置Uniform变量...
+	// PS：设置前需要调用Active()函数，激活当前程序
+	inline void setBool(const std::string& name, bool value) const {
+		glUniform1i(glGetUniformLocation(mResourceID, name.c_str()), value);
+	}
+
+	inline void setInt(const std::string& name, int value) const {
+		glUniform1i(glGetUniformLocation(mResourceID, name.c_str()), value);
+	}
+
+	inline void setFloat(const std::string& name, const float& value) const {
+		glUniform1f(glGetUniformLocation(mResourceID, name.c_str()), value);
+	}
+
+	inline void setVec3(const std::string& name, const glm::vec3& value) const {
+		glUniform3fv(glGetUniformLocation(mResourceID, name.c_str()), 1, &value[0]);
+	}
+
+	inline void setMat4(const std::string& name, const glm::mat4& value) const {
+		glUniformMatrix4fv(glGetUniformLocation(mResourceID, name.c_str()), 1, GL_FALSE, &value[0][0]);
 	}
 
 private:

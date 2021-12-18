@@ -8,7 +8,7 @@ class GPUDevice;
 class FrameBuffer;
 class GPUProgram;
 class ShaderResource;
-class UniformBuffer;
+class ShaderBuffer;
 class VertexBuffer;
 
 
@@ -51,24 +51,21 @@ public:
 		mVertexBuffer = vao;
 	}
 	
-	// Bind Uniform Buffer(将ubo对象ID绑定到着色器程序对应的UniformIndex上)
-	inline void BindUB(unsigned int index, std::shared_ptr<UniformBuffer> ubo) {
+	// Bind Shader Buffer(将ubo对象ID绑定到着色器程序对应的UniformIndex上)
+	inline void BindSB(unsigned int index, std::shared_ptr<ShaderBuffer> sbo) {
 		// glBindBufferBase(GL_UNIFORM_BUFFER, index, ubo->GetResourceID());
-		mUniformBuffers.emplace_back(index, ubo);
+		mShaderBuffers.emplace_back(index, sbo);
 	}
 
 	// Bind Frame Buffer
-	inline void BindFB(std::shared_ptr<FrameBuffer> fbo) {
-		// glBindFramebuffer(GL_FRAMEBUFFER, fbo->GetResourceID());
-		mFrameBuffer = fbo;
-	}
+	void BindFB(std::shared_ptr<FrameBuffer> fbo);
 
 	// 清理之前所绑定的渲染资源
 	inline void CleanUp() {
-		mFrameBuffer = nullptr;
+		//mFrameBuffer = nullptr;
 		mVertexBuffer = nullptr;
 		mProgram = nullptr;
-		mUniformBuffers.clear();
+		mShaderBuffers.clear();
 		mTextures.clear();
 	}
 
@@ -87,13 +84,13 @@ private:
 		std::shared_ptr<ShaderResource> texture;
 	};
 
-	struct UniformWithIndex {
-		UniformWithIndex(unsigned int id, std::shared_ptr<UniformBuffer> un)
+	struct BufferWithIndex {
+		BufferWithIndex(unsigned int id, std::shared_ptr<ShaderBuffer> bf)
 			:index(id)
-			,uniform(un) {}
+			,buffer(bf) {}
 
 		unsigned int index;
-		std::shared_ptr<UniformBuffer> uniform;
+		std::shared_ptr<ShaderBuffer> buffer;
 	};
 
 private:
@@ -101,11 +98,11 @@ private:
 
 	// 当前渲染帧需要绑定的资源
 	// Frame Buffer
-	std::shared_ptr<FrameBuffer> mFrameBuffer;
+	// std::shared_ptr<FrameBuffer> mFrameBuffer;
 	// Vertex Buffer
 	std::shared_ptr<VertexBuffer> mVertexBuffer;
 	// Uniform Buffer
-	std::vector<UniformWithIndex> mUniformBuffers;
+	std::vector<BufferWithIndex> mShaderBuffers;
 	// GPU Shader Program
 	std::shared_ptr<GPUProgram> mProgram;
 	// GPU Texture

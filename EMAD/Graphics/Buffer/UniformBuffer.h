@@ -1,13 +1,13 @@
 #pragma once
-#include <Graphics/GPUResource.h>
+#include "ShaderBuffer.h"
 
-class UniformBuffer : public GPUResource {
+class UniformBuffer : public ShaderBuffer {
 public:
 	using ptr = std::shared_ptr<UniformBuffer>;
-
+	
 public:
 	UniformBuffer(const std::string& name, GPUDevice* device)
-		:GPUResource(name, ResourceType::UniformBuffer, device) {
+		:ShaderBuffer(name, ResourceType::UniformBuffer, device) {
 		glGenBuffers(1, &mResourceID);
 	}
 

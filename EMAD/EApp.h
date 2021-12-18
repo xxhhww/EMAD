@@ -11,6 +11,7 @@ public:
 	int Run();
 
 private:
+	void DebugSceneRun();
 	void DebugDeferredRun();
 	void DebugSphereRun();
 	void DebugQuadRun();

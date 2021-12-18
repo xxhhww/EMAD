@@ -17,6 +17,7 @@ public:
 		Program,
 		VertexBuffer,
 		UniformBuffer,
+		StorageBuffer,
 		FrameBuffer,
 		RenderBuffer,
 		Other

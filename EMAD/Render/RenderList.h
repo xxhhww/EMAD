@@ -6,6 +6,18 @@
 
 class RenderContext;
 
+// 点光源的数据
+struct PointLightData {
+	PointLightData(glm::vec4 color, glm::vec3 pos, float intensity)
+		: LightColor(color)
+		, LightPos(pos)
+		, LightIntensity(intensity) {}
+
+	glm::vec4 LightColor;
+	glm::vec3 LightPos;
+	float LightIntensity;
+};
+
 // 存放所有需要绘制的DrawCall
 class RenderList {
 public:
@@ -24,9 +36,11 @@ public:
 
 	inline void ClearDrawCall() {
 		mDrawCalls.clear();
+		mPointLights.clear();
 	}
-
-private:
+public:
 	// 目前不分Batch
 	std::map<DrawCallPass, std::vector<DrawCall::ptr>> mDrawCalls;
+	// 光照信息
+	std::vector<PointLightData> mPointLights;
 };

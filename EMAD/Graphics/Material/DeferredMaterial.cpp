@@ -50,5 +50,5 @@ void DeferredMaterial::Bind(BindInfo& bindinfo)
 		tempTransData.projTrans = bindinfo.MyRenderContext->mRenderView->MyOrthoTrans;
 
 	mUniformBuffer->FillBuffer(0, sizeof(TransData), &tempTransData);
-	gContext->BindUB(0, mUniformBuffer);
+	gContext->BindSB(0, mUniformBuffer);
 }
