@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include "MaterialShader.h"
 
 class RenderContext;
 class DrawCall;
@@ -15,8 +16,12 @@ public:
 	};
 
 public:
-	// 初始化
+	// 初始化/更新
 	virtual void Init() = 0;
 	// 将材质的数据绑定到GPUContext
 	virtual void Bind(BindInfo& bindinfo) = 0;
+	// 生成材质控制界面
+	virtual void GenCtrlGui() {
+
+	}
 };

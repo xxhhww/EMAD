@@ -22,7 +22,9 @@
 #include <Render/Pass/LightPass.h>
 #include <Render/Pass/ForwardPass.h>
 #include <Actor/Light/PointLight.h>
-
+#include <ImGui/imgui.h>
+#include <ImGui/imgui_impl_glfw.h>
+#include <ImGui/imgui_impl_opengl3.h>
 #include <Scene/Scene.h>
 
 #include <iostream>
@@ -35,13 +37,13 @@ EApp::EApp(int width, int height, const std::string& name){
 	GWin::Instance()->Init(width, height, name);
 	GPUDevice::Instance();
 	// 初始化渲染服务
-	//RenderService::Instance()->Init();
+	RenderService::Instance()->Init();
 
 	// 初始化摄像机
 	mCamera = std::make_shared<Camera>();
 
 	// 启动深度缓冲测试
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 	// 启动模板测试
 	//glEnable(GL_STENCIL_TEST);
 
@@ -54,7 +56,7 @@ int EApp::Run()
 	float deltaTime = 0.0f; // 当前帧与上一帧的时间差
 	float lastFrame = 0.0f; // 上一帧的时间
 
-	//Scene::Instance()->Init();
+	Scene::Instance()->Init();
 
 	while (!glfwWindowShouldClose(GWin::Instance()->window()))
 	{
@@ -67,13 +69,20 @@ int EApp::Run()
 		this->HandleInput(deltaTime);
 		
 		// Render Scene
-		//Scene::Instance()->Render(mCamera);
+		Scene::Instance()->Render(mCamera);
 
 		// GenCtrlGui
-		//Scene::Instance()->GenCtrlGui();
+		//创建imgui
+		ImGui_ImplOpenGL3_NewFrame();
+		ImGui_ImplGlfw_NewFrame();
+		ImGui::NewFrame();
 
-		GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT);
-		GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+		Scene::Instance()->GenCtrlGui();
+
+		ImGui::Render();
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		//GPUDevice::Instance()->GetContext()->ClearBuffer(GL_COLOR_BUFFER_BIT);
+		//GPUDevice::Instance()->GetContext()->ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
 		//DebugTriangleRun();
 		//DebugSphereRun();
 		//DebugDeferredRun();

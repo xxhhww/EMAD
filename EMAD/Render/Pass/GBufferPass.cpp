@@ -49,6 +49,7 @@ void GBufferPass::Render(std::shared_ptr<RenderContext> rContext)
 	// »Ö¸´Ä¬ÈÏÖ¡»º´æ
 	gContext->BindFB(nullptr);
 
+	/*
 	gContext->ClearBuffer(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	// Just Test
 	GPUProgram::ptr testProgram = GPUDevice::Instance()->Create<GPUProgram>("Program_DebugGBufferQuad");
@@ -59,7 +60,7 @@ void GBufferPass::Render(std::shared_ptr<RenderContext> rContext)
 
 	Quad::Render(gContext);
 	// TODO»Ö¸´Ä¬ÈÏFrameBuffer
-	
+	*/
 }
 
 

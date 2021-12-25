@@ -25,4 +25,5 @@ void Ball::Submit(std::shared_ptr<RenderContext> renderContext)
 
 void Ball::GenCtrlGui(){
 
+	mMaterial->GenCtrlGui();
 }

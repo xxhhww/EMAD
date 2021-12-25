@@ -21,21 +21,45 @@ public:
 	inline GPUShader::ptr AttachShader(ShaderType sType, const std::string& sName) {
 		// 检查当前Attach的Shader是否已经在容器中
 		for (const auto& i : mShaders) {
-			if (i->GetName() == sName) {
+			if (i->GetShaderType() == sType) {
 				return nullptr;
 			}
 		}
 
-		GPUShader::ptr temp = std::make_shared<GPUShader>(sType, sDirectory, sName, mDevice);
+		GPUShader::ptr temp = std::make_shared<GPUShader>(sType, sDirectory, sName);
 		mShaders.emplace_back(temp);
 		return temp;
 	}
+
+	// 从内存字符串中读取着色器数据
+	inline GPUShader::ptr AttachShaderEx(ShaderType sType, const std::string& shaderCode) {
+		// 检查当前Attach的Shader是否已经在容器中
+		for (const auto& i : mShaders) {
+			if (i->GetShaderType() == sType) {
+				return nullptr;
+			}
+		}
+
+		GPUShader::ptr temp = std::make_shared<GPUShader>(sType, shaderCode);
+		mShaders.emplace_back(temp);
+
+		return temp;
+	}
+
+
 	// 从容器中获得对应的着色器对象
 	inline GPUShader::ptr GetShader(ShaderType sType) const {
 		for (auto& i : mShaders) {
 			if (i->GetShaderType() == sType)
 				return i;
 		}
+	}
+
+	// 初始化当前Program
+	inline void ReComplie() {
+		glDeleteProgram(mResourceID);
+		mIsLink = false;
+		mResourceID = glCreateProgram();
 	}
 
 	// 设置Uniform变量...

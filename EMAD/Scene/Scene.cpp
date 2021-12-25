@@ -22,6 +22,7 @@ void Scene::Init()
 
 	// 预设材质
 	// Bind AssetTexture to Material
+	/*
 	static DeferredMaterial::ptr IronMaterial = std::make_shared<DeferredMaterial>();
 	static bool HasCteatedMaterial = false;
 	if (!HasCteatedMaterial) {
@@ -51,6 +52,7 @@ void Scene::Init()
 
 		HasCteatedMaterial = true;
 	}
+	*/
 
 	// 初始化场景
 	// 点光源
@@ -60,7 +62,9 @@ void Scene::Init()
 	mActors.emplace_back(tempPointLight);
 	// 金属球
 	Ball::ptr tempBall = std::make_shared<Ball>();
-	tempBall->SetMaterial(IronMaterial);
+	DeferredMaterial::ptr tempMaterial = std::make_shared<DeferredMaterial>();
+	tempMaterial->Init();
+	tempBall->SetMaterial(tempMaterial);
 
 	mActors.emplace_back(tempBall);
 }
@@ -91,5 +95,7 @@ void Scene::Render(std::shared_ptr<Camera> camera)
 
 void Scene::GenCtrlGui()
 {
-
+	for (const auto& i : mActors) {
+		i->GenCtrlGui();
+	}
 }
